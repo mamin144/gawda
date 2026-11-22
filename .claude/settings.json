@@ -13,7 +13,8 @@
       "Read(**/*.xlsx)",
       "Read(**/*.xlsm)",
       "Read(app/env/dev.json)",
-      "Read(app/env/prod.json)"
+      "Read(app/env/prod.json)",
+      "mcp__plugin_supabase_supabase"
     ],
     "ask": [
       "Bash(supabase db push*)",
