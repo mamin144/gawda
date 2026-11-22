@@ -151,3 +151,14 @@ Run from a fresh terminal (PATH rebuilt from the registry, so `D:\Tools\Python31
 ## Executor switch to Claude Code (22 November 2026)
 
 OpenCode is retired; Claude Code executes the project. Skills stay sourced in `.agents/skills/` (`skills-lock.json`) and are copied to `.claude/skills/` so the Claude Code `Skill` tool discovers them. `node verify_p0.mjs` reports all 23 required skills `OK` and `.claude/skills identical to .agents/skills: yes (222 files)`. After installing or updating a skill in `.agents/skills/`, re-copy it to `.claude/skills/` and re-run the verifier.
+
+## P1 Database and Security: SKILLS LOADED (22 November 2026)
+
+Loaded with the Claude Code `Skill` tool at the start of P1: `supabase`, `supabase-postgres-best-practices`, `writing-plans`, `test-driven-development`, `insecure-defaults`, `sharp-edges`, `verification-before-completion` (all 7 required by `docs/OPENCODE_PROMPT.md`).
+
+Applied so far, in the plan only (no code yet):
+- `writing-plans`: required header, Global Constraints, Review Focus (5 items, each with a test in its owning task), Interfaces per task, self-review.
+- `supabase`: SECURITY DEFINER helpers in non-exposed `private` schema with `search_path = ''`; `TO authenticated` + ownership predicates; `(select auth.uid())`; explicit grants; `migration new` for filenames; advisors before completion; changelog check as Task 0 step 1.
+- `supabase-postgres-best-practices`: indexes on FK/filter columns, `numeric(18,2)`, generated period columns.
+- `test-driven-development`: every task starts with a failing pgTAP/Deno test.
+- `sharp-edges` / `insecure-defaults`: storage path parser never raises (deny on malformed), no known seed passwords, service-only RPCs, idempotent finalize.

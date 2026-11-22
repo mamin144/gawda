@@ -49,10 +49,11 @@
   - `list_tables` with `schemas: ["public"]`, `verbose: false` on the DEV project (`kbjsonvnbbhvczttvzhv`) returned `{"tables":[]}`: the `public` schema is empty, as expected before P1 (no migrations applied yet).
   - Still open for the owner: `supabase login` / `supabase link`.
 
-## P1: Database and Security (pending)
-- Status: Not started - awaiting owner approval of P0.
+## P1: Database and Security (in progress)
+- P0 approved by the owner on 22 November 2026 ("Approve P0, start P1").
+- Status: plan written (`docs/superpowers/plans/2026-11-22-p1-database-security.md`), awaiting owner review, the testing-environment decision (Docker not installed) and answers to Q11-Q14.
 - Requirements: supabase CLI, pgTAP tests, RLS policies, seed data, Edge Functions.
-- Dependencies: supabase, supabase-postgres-best-practices, insecure-defaults, sharp-edges, audit-context-building.
+- Skills (per docs/OPENCODE_PROMPT.md): supabase, supabase-postgres-best-practices, writing-plans, test-driven-development, insecure-defaults, sharp-edges, verification-before-completion.
 
 ## P2: App Foundation (pending)
 - Status: Not started.
