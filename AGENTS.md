@@ -7,7 +7,7 @@ This file is loaded in every session. Follow it exactly.
 - Open questions live in `docs/OPEN_QUESTIONS.md`. If a task depends on an unanswered question, STOP and ask the owner. Never guess a business rule, a financial formula, a field, or a status transition.
 
 ## Skills are MANDATORY (strict)
-1. Before starting any phase or task, load every skill listed for that phase in `docs/OPENCODE_PROMPT.md` (section "Skills per phase") using the native `skill` tool.
+1. Before starting any phase or task, load every skill listed for that phase in `docs/OPENCODE_PROMPT.md` (section "Skills per phase") using the `Skill` tool (Claude Code discovers them in `.claude/skills/`; see `CLAUDE.md`).
 2. If a required skill is not installed, find it, install it (see the install protocol in the prompt), verify it loads, and only then continue.
 3. If a required skill cannot be installed or loaded, STOP and report. Do NOT continue without it and do NOT replace it with your own knowledge.
 4. Start every phase report with a "SKILLS LOADED" list and end it with a "SKILLS APPLIED" list that says concretely which rules of each skill changed the code. Append the same to `docs/SKILLS_LOG.md`.

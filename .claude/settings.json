@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "enabledMcpjsonServers": ["supabase", "dart", "context7"],
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(supabase db reset*)",
+      "Bash(supabase projects delete*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.xlsx)",
+      "Read(**/*.xlsm)",
+      "Read(app/env/dev.json)",
+      "Read(app/env/prod.json)"
+    ],
+    "ask": [
+      "Bash(supabase db push*)",
+      "Bash(supabase link*)"
+    ]
+  }
+}

@@ -1,5 +1,7 @@
 # OPENCODE KICKOFF PROMPT
 
+> **Status (22 November 2026): OpenCode is retired; Claude Code executes the project.** The phase plan, gates, rules and the "Skills per phase" table below still apply. OpenCode-only setup (`opencode.json`, OpenCode plugins, `opencode mcp ...`) is historical; the Claude equivalents are `CLAUDE.md`, `.mcp.json` and `.claude/settings.json`.
+
 Paste everything below the line into OpenCode as the first message. Keep a copy of this file at `docs/OPENCODE_PROMPT.md` in the project (the agent rules refer to it).
 
 ---

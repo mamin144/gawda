@@ -147,3 +147,7 @@ Run from a fresh terminal (PATH rebuilt from the registry, so `D:\Tools\Python31
 - Supabase MCP checks: `url present: yes`, `read_only=true: yes`, `project_ref present: yes`, `forbidden groups: none`, `plugins (V2 array): OK "@tarquinen/opencode-dcp@latest"`, `permissions (V2 array): OK 11 rules`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 4 OK`.
 - `git status --short` -> clean. `git log --oneline -4` -> `1a35f76`, `b8705ec`, `8ce6580`, `58a9528`.
 - No `MISSING`, `ERROR`, `WARNING`, `plugin entries: none`, or `permission block: NO` line exists in the output.
+
+## Executor switch to Claude Code (22 November 2026)
+
+OpenCode is retired; Claude Code executes the project. Skills stay sourced in `.agents/skills/` (`skills-lock.json`) and are copied to `.claude/skills/` so the Claude Code `Skill` tool discovers them. `node verify_p0.mjs` reports all 23 required skills `OK` and `.claude/skills identical to .agents/skills: yes (222 files)`. After installing or updating a skill in `.agents/skills/`, re-copy it to `.claude/skills/` and re-run the verifier.

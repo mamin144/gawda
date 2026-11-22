@@ -34,6 +34,15 @@
   - `docs/SKILLS_LOG.md`: logged the `flutter-responsive-layout` -> `flutter-build-responsive-layout` mapping (no `flutter-responsive-layout` upstream), updated the stale `flutter-bloc` row, logged the optional `static-analysis` status and the superpowers skills-vs-plugin note.
   - Still open for the owner: the Supabase MCP "harmless read call" proof (for example list tables) has not been pasted yet; `opencode mcp list` only shows it is authenticated and connected. `supabase login` / `supabase link` not done yet (owner types the DB password in the terminal). Section 1.6 items: superpowers plugin not installed (skills are), `opencode-notifier` not installed (optional), Envsitter Guard not installed (replaced by read-deny permissions).
 
+- Executor switch on 22 November 2026 (owner decision): **Claude Code now executes the whole project; OpenCode is retired.**
+  - Skills: the 23 skills in `.agents/skills/` (source, `skills-lock.json`) are copied to `.claude/skills/`, where Claude Code discovers them. `node verify_p0.mjs` checks the two trees are identical (`yes (222 files)`).
+  - MCP: project-scoped `.mcp.json` with `supabase` (DEV `project_ref`, `read_only=true`, features `docs,database,debugging,development`), `dart` (`dart mcp-server`) and `context7`. No user-scope Supabase entry. Approved for the project through `enabledMcpjsonServers` in `.claude/settings.json`.
+  - Permissions: `.claude/settings.json` denies `rm -rf`, `git push --force`/`-f`, `supabase db reset`, `supabase projects delete`, and reads of `.env`, `.env.*`, `*.xlsx`, `*.xlsm`, `app/env/dev.json`, `app/env/prod.json`; `supabase db push` and `supabase link` always ask. `.claude/settings.local.json` is gitignored.
+  - `CLAUDE.md` imports `AGENTS.md`; `AGENTS.md` now says skills load with the `Skill` tool; `docs/OPENCODE_PROMPT.md` carries a status note that its OpenCode-only setup steps are historical (phase plan and "Skills per phase" table still apply).
+  - `opencode.json` removed (it remains in Git history). The OpenCode plugin items of section 1.6 (`opencode-dcp`, `opencode-notifier`, Envsitter Guard) no longer apply.
+  - `verify_p0.mjs` now checks `.mcp.json`, the `.claude/settings.json` deny rules, `CLAUDE.md`, and the skill copy instead of `opencode.json`. Run result: exit 0, `Missing required: 0`, all Supabase MCP checks `yes`/`none`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 5 OK`, secret scan clean, no `MISSING`/`ERROR`/`WARNING`.
+  - Still open for the owner: authenticate the Supabase MCP in Claude Code (OAuth in the browser) and then the harmless read proof (list tables); `supabase login` / `supabase link`.
+
 ## P1: Database and Security (pending)
 - Status: Not started - awaiting owner approval of P0.
 - Requirements: supabase CLI, pgTAP tests, RLS policies, seed data, Edge Functions.
