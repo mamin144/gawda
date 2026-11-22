@@ -85,12 +85,22 @@ Both resolve first to `D:\Tools\Python313\` and report `Python 3.13.17`. The Mic
 | `opencode mcp list` | context7 `connected`, dart `connected`, supabase `connected` (an unrelated stale global `shadcn` entry fails on a missing path and is out of scope) |
 | `opencode plugin list` | `opencode-dcp 3.2.1` from `@tarquinen/opencode-dcp@latest` |
 | `supabase --version` | `3.2.0` |
-| `node verify_p0.mjs` | `Missing required: 0` (23/23 skills); 8/8 required files; no stray files; no forbidden tracked files; secret scan clean |
+| `node verify_p0.mjs` | `Missing required: 0` (23/23 skills); 8/8 required files; no stray files; no forbidden tracked files; secret scan clean; `plugins (V2 array): OK`; `permissions (V2 array): OK 11 rules`; `deny shell actions: all 4 OK`; `deny secret/file reads: all 4 OK` |
 | `git status --short` | clean |
 | `git log --oneline -3` | `8ce6580`, `58a9528`, `d7a3f1b` |
 
-### Known checker staleness (not a config defect)
-`verify_p0.mjs` prints `plugin entries: none` and `permission block: NO`. Its lines 83-84 search for the V1 keys `"plugin"` and `"permission"`, but the live config uses the V2 keys `"plugins"` and `"permissions"`, which is correct for Desktop CLI `2.1.4`. Functional proof: `opencode plugin list` shows `opencode-dcp 3.2.1` loaded, and the V2 `permissions` array denies `rm -rf`, `git push --force`, `supabase db reset`, `supabase projects delete`, `*.env`, `*.env.*`, `*.xlsx`, `*.xlsm`, with `shell` and `external_directory` set to `ask`. The checker was left unmodified because only documentation changes were authorized.
+### Checker updated for OpenCode V2 (verifier-only fix, owner-authorized)
+
+`verify_p0.mjs` previously printed `plugin entries: none` and `permission block: NO` because its old lines 83-84 searched for the retired V1 keys `"plugin"` and `"permission"`. The live config correctly uses the V2 keys `"plugins"` and `"permissions"` (Desktop CLI `2.1.4`).
+
+The verifier was fixed to validate V2 and to **strengthen** the security assertion rather than relax it:
+
+- `plugins (V2 array)` — requires a non-empty `"plugins"` array and prints its contents.
+- `permissions (V2 array)` — requires a non-empty `"permissions"` array and prints the rule count.
+- `deny shell actions` — asserts each of `rm -rf *`, `git push --force*`, `supabase db reset*`, `supabase projects delete*` still carries `"effect": "deny"`.
+- `deny secret/file reads` — asserts each of `*.env`, `*.env.*`, `*.xlsx`, `*.xlsm` still carries `"effect": "deny"`.
+
+Final run (fresh terminal, Python on PATH) printed `plugins (V2 array): OK "@tarquinen/opencode-dcp@latest"`, `permissions (V2 array): OK 11 rules`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 4 OK`, with no `MISSING`, `ERROR`, `WARNING`, `plugin entries: none`, or `permission block: NO`. `opencode.json` was not modified.
 
 ## P0 Remediation — 22 November 2026
 

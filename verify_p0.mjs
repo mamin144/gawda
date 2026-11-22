@@ -80,8 +80,24 @@ else {
   log(`  read_only=true:         ${/read_only=true/.test(url) ? "yes" : "NO"}`);
   log(`  project_ref present:    ${/project_ref=[a-z0-9]+/.test(url) ? "yes" : "NO"}`);
   log(`  forbidden groups:       ${/account|branching|feedback|notebooks/.test(url) ? "YES (remove them)" : "none"}`);
-  log(`  plugin entries:         ${(txt.match(/"plugin"\s*:\s*\[[^\]]*\]/) || ["none"])[0]}`);
-  log(`  permission block:       ${/"permission"/.test(txt) ? "present" : "NO"}`);
+  // OpenCode V2 config keys: "plugins" (array) and "permissions" (array of rules).
+  const pluginsArr = (txt.match(/"plugins"\s*:\s*\[([^\]]*)\]/) || [null, null])[1];
+  const pluginsOk = pluginsArr !== null && pluginsArr.trim().length > 0;
+  log(`  plugins (V2 array):     ${pluginsOk ? "OK  " + pluginsArr.trim() : "MISSING or EMPTY"}`);
+
+  const permArr = (txt.match(/"permissions"\s*:\s*\[([\s\S]*?)\n\s*\]/) || [null, null])[1];
+  const permRules = permArr ? (permArr.match(/"effect"\s*:/g) || []).length : 0;
+  const permOk = permArr !== null && permRules > 0;
+  log(`  permissions (V2 array): ${permOk ? "OK  " + permRules + " rules" : "MISSING or EMPTY"}`);
+
+  // Security checks are enforced, not relaxed: every forbidden action must still be denied.
+  const denyOf = (res) => new RegExp(`"resource"\\s*:\\s*"${res.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*,\\s*"effect"\\s*:\\s*"deny"`).test(permArr || "");
+  const shellDenies = ["rm -rf *", "git push --force*", "supabase db reset*", "supabase projects delete*"];
+  const readDenies = ["*.env", "*.env.*", "*.xlsx", "*.xlsm"];
+  const shellMissing = shellDenies.filter((r) => !denyOf(r));
+  const readMissing = readDenies.filter((r) => !denyOf(r));
+  log(`  deny shell actions:     ${shellMissing.length ? "MISSING: " + shellMissing.join(", ") : "all " + shellDenies.length + " OK"}`);
+  log(`  deny secret/file reads: ${readMissing.length ? "MISSING: " + readMissing.join(", ") : "all " + readDenies.length + " OK"}`);
 }
 const g = path.join(home, ".config/opencode/opencode.json");
 if (fs.existsSync(g) && /supabase/i.test(fs.readFileSync(g, "utf8"))) log(`\nWARNING: global config ${g} mentions supabase. Remove it (project-level only).`);
