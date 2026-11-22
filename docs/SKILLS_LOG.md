@@ -57,6 +57,41 @@
 - Invoke skills before any response/action (from using-superpowers)
 - Verify before claiming completion (from verification-before-completion)
 
+## P0 Verification Evidence (22 November 2026)
+
+### Toolchain gate
+`python` and `python3` are both required by the approved UI/UX tooling. After installing Python 3.13.17 to `D:\Tools\Python313`, `python --version` worked but `python3` did not, because CPython's Windows installer ships only `python.exe` and `py.exe`. The owner approved a hard link (not a copy):
+
+```powershell
+New-Item -ItemType HardLink -Path "D:\Tools\Python313\python3.exe" -Target "D:\Tools\Python313\python.exe"
+```
+
+Result: `LinkType: HardLink`, `Length: 105696`, and `fsutil hardlink list` shows exactly 2 links (`python3.exe`, `python.exe`) to the same file data.
+
+Verified with `PATH` rebuilt from the registry (equivalent to a fresh terminal):
+
+| Command | Output | Exit |
+|---|---|---|
+| `where python` | `D:\Tools\Python313\python.exe` then `...\WindowsApps\python.exe` | 0 |
+| `where python3` | `D:\Tools\Python313\python3.exe` then `...\WindowsApps\python3.exe` | 0 |
+| `python --version` | `Python 3.13.17` | 0 |
+| `python3 --version` | `Python 3.13.17` | 0 |
+
+Both resolve first to `D:\Tools\Python313\` and report `Python 3.13.17`. The Microsoft Store App Execution Alias stubs are shadowed.
+
+### Evidence pass
+| Check | Result |
+|---|---|
+| `opencode mcp list` | context7 `connected`, dart `connected`, supabase `connected` (an unrelated stale global `shadcn` entry fails on a missing path and is out of scope) |
+| `opencode plugin list` | `opencode-dcp 3.2.1` from `@tarquinen/opencode-dcp@latest` |
+| `supabase --version` | `3.2.0` |
+| `node verify_p0.mjs` | `Missing required: 0` (23/23 skills); 8/8 required files; no stray files; no forbidden tracked files; secret scan clean |
+| `git status --short` | clean |
+| `git log --oneline -3` | `8ce6580`, `58a9528`, `d7a3f1b` |
+
+### Known checker staleness (not a config defect)
+`verify_p0.mjs` prints `plugin entries: none` and `permission block: NO`. Its lines 83-84 search for the V1 keys `"plugin"` and `"permission"`, but the live config uses the V2 keys `"plugins"` and `"permissions"`, which is correct for Desktop CLI `2.1.4`. Functional proof: `opencode plugin list` shows `opencode-dcp 3.2.1` loaded, and the V2 `permissions` array denies `rm -rf`, `git push --force`, `supabase db reset`, `supabase projects delete`, `*.env`, `*.env.*`, `*.xlsx`, `*.xlsm`, with `shell` and `external_directory` set to `ask`. The checker was left unmodified because only documentation changes were authorized.
+
 ## P0 Remediation — 22 November 2026
 
 ### Skills Loaded
