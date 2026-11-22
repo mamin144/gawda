@@ -71,4 +71,5 @@
 - `supabase`, `supabase-postgres-best-practices`, `insecure-defaults`, and `sharp-edges`: retained the private, read-only project-scoped MCP posture and did not introduce credentials, permissive access, or schema changes.
 - `ui-ux-pro-max`: retained `python3` as a prerequisite for P2 rather than bypassing its required helper.
 - `flutter-apply-architecture-best-practices`: recorded the owner-approved `flutter_bloc` package decision without falsely claiming a nonexistent BLoC skill is installed.
+- `sharp-edges`: migrated the OpenCode configuration to V2 so secure restrictions use active `permissions` rules instead of obsolete V1 fields that could be silently ignored.
 - All remaining loaded skills: no product or database code exists yet, so their implementation-specific rules were not applied in P0.

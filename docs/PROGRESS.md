@@ -5,7 +5,9 @@
 - Skills: 23 installed skills are present under `.agents/skills/`, each with a `SKILL.md`; the unavailable `flutter-bloc` skill is an owner-approved exception, not an installed skill.
 - `insecure-defaults`: upstream `trailofbits/skills` ships it as a plugin (`plugins/insecure-defaults`), not as a skill; `npx skills add ... --skill insecure-defaults` returns `[SKILLS_NO_MATCHING_SKILLS]`. Vendored from the upstream repo and wrapped with a `SKILL.md` (see `docs/SKILLS_LOG.md`).
 - `flutter-bloc`: no BLoC skill exists in `flutter/agent-plugins` (25 skills listed, none BLoC/Cubit). The owner approved use of the `flutter_bloc` package with `flutter-apply-architecture-best-practices` as a documented exception on 22 November 2026; this is no longer an open question.
-- MCP servers: supabase (remote, read-only, DEV project), dart (local), context7 (remote). Supabase MCP proven with `list_tables` -> `{"tables": []}`.
+- MCP servers: Supabase (remote, read-only, DEV project), Dart (local), and Context7 (remote) were all reported `connected` by `opencode mcp list` on 22 November 2026. An unrelated stale global `shadcn` entry failed because its old path no longer exists; it was not modified from this project.
+- OpenCode config: migrated to the native V2 shape after verifying the installed Desktop CLI is `2.1.4`; server entries now live under `mcp.servers`, and V2 `permissions` preserve the planned safety denials.
+- Plugins: `opencode-dcp` version `3.2.1` is installed. `opencode-notifier` remains optional and is not installed. Envsitter Guard is not installed; V2 read permissions deny `.env*`, `.xlsx`, and `.xlsm` files instead.
 - Git repo: initialized, 3 commits.
 - .gitignore: `.env*`, `*.xlsx`, `*.xlsm`, `app/env/`, build outputs.
 - docs/ layout: `PROJECT_PLAN.md`, `OPENCODE_PROMPT.md`, `OPEN_QUESTIONS.md`, `PROGRESS.md`, `SKILLS_LOG.md`. `AGENTS.md` is at the repository root.
