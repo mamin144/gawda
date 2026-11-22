@@ -1,0 +1,23 @@
+# Environment files
+.env*
+*.xlsx
+*.xlsm
+
+# Build outputs
+/build/
+/.dart_tool/
+/.firebase/
+
+# Supabase outputs
+/functions/**
+/storage/**/.private/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system
+.DS_Store
+Thumbs.db
