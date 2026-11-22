@@ -17,6 +17,17 @@
 - `docs/OPENCODE_PROMPT.md` section 3 "P1 Database and security";
 - `AGENTS.md`.
 
+## Test Environment (owner decision, 22 November 2026)
+
+Tests and migrations run **remotely on the DEV project** (`kbjsonvnbbhvczttvzhv`); there is no local Docker stack.
+- One-time: the owner runs `supabase link --project-ref kbjsonvnbbhvczttvzhv` and types the DB password in the terminal (never in chat, never stored in the repo).
+- Apply: `supabase db push --dry-run`, then `supabase db push` (asks for approval every time).
+- Test: `supabase test db --remote`. Every pgTAP file runs in one transaction ending in `rollback`, so test users, sites and objects never persist on DEV.
+- Advisors: `supabase db advisors --remote --type all` and MCP `get_advisors`.
+- Migrations are forward-only: a pushed migration is never edited. A mistake is fixed by a new migration. `supabase db reset` stays denied.
+- Before each push, the task's migration is reviewed against its tests (RED first: tests run against DEV before the push and must fail for the expected reason).
+- Risk to check in Task 0: if `supabase test db --remote` still needs Docker for `pg_prove` on CLI 3.2.0, STOP and report; the fallback is running each test file with `psql` against the linked DB, with the owner's approval.
+
 ## Global Constraints
 
 - RLS enabled on every table; every table has tests. Never use `user_metadata` for authorization.
@@ -91,7 +102,7 @@ Task 0 adds only `create_user` without the profile step. The profile insert is a
 - [ ] Step 1: Fetch `https://supabase.com/changelog.md`. Note any `breaking-change` entries for RLS, Storage, Data API grants, pgTAP or Edge Functions in `docs/SKILLS_LOG.md`.
 - [ ] Step 2: Run `supabase init` (non-interactive). Keep `config.toml` defaults. Set `[storage] file_size_limit = "2MiB"`.
 - [ ] Step 3: Write `00_smoke.test.sql`: `\ir _helpers.sql`, then `select plan(2); select has_extension('pgtap'); select has_schema('tests'); select * from finish(); rollback;`. If `\ir` is unsupported by the runner, inline the helper block in each file; record this in the plan.
-- [ ] Step 4: `supabase start`, then `supabase test db`. Expected: `00_smoke ... ok`, `Result: PASS`.
+- [ ] Step 4: Migration `supabase migration new enable_pgtap` with `create extension if not exists pgtap with schema extensions`. `supabase db push`, then `supabase test db --remote`. Expected: `00_smoke ... ok`, `Result: PASS`.
 - [ ] Step 5: Commit `chore(p1): init supabase project and pgTAP harness`.
 
 ### Task 1: Enums and period function
@@ -114,9 +125,9 @@ Task 0 adds only `create_user` without the profile step. The profile insert is a
     - `2025-02-16`.
   - `period_half(null)` is null.
   - `has_type` for the three enums with `enum_has_labels` exact label order.
-- [ ] Step 2: `supabase test db`. Expected: FAIL (function missing).
+- [ ] Step 2: `supabase test db --remote`. Expected: FAIL (function missing).
 - [ ] Step 3: `supabase migration new enums_and_period` and implement: `case when extract(day from d) <= 15 then 1 else 2 end`.
-- [ ] Step 4: `supabase migration up --local` then `supabase test db`. Expected: PASS.
+- [ ] Step 4: `supabase db push` then `supabase test db --remote`. Expected: PASS.
 - [ ] Step 5: Commit `feat(p1): add enums and period derivation function`.
 
 ### Task 2: Profiles, sites, user_sites, authorization helpers
@@ -156,7 +167,7 @@ Tests (write first, watch them fail):
   1. Tests.
   2. Run; FAIL.
   3. Migration.
-  4. `migration up --local` + `test db`; PASS.
+  4. `supabase db push` + `supabase test db --remote`; PASS.
   5. Commit `feat(p1): profiles, sites, user_sites with RLS helpers`.
 
 ### Task 3: Certificates
@@ -424,16 +435,15 @@ Steps: Deno test first (FAIL), handler, PASS, commit `feat(p1): admin-create-use
 - One certificate in each status for site 1.
 - No real names, no Excel data.
 
-Verify by starting the local stack fresh (`supabase stop --no-backup` then `supabase start`, which re-runs migrations and the seed), then `supabase test db`: PASS. Commit `chore(p1): fake seed data`.
+Apply with `supabase db push --include-seed` (owner approval), check the rows with MCP `execute_sql` (read-only), then `supabase test db --remote`: PASS. Seed must be idempotent (`on conflict do nothing`). Commit `chore(p1): fake seed data`.
 
 ### Task 11: Advisors, DEV push, evidence
 
-- [ ] `supabase db advisors --type all --level info` (local). Fix every security finding and re-run until there are 0 security issues.
-- [ ] The owner runs `supabase link --project-ref kbjsonvnbbhvczttvzhv` and types the DB password in the terminal. Then `supabase db push --dry-run`, the owner approves, then `supabase db push`.
+- [ ] `supabase db advisors --remote --type all --level info`. Fix every security finding (new migration) and re-run until there are 0 security issues.
 - [ ] MCP `get_advisors` (security and performance) on DEV. Fix and re-run until there are no ERROR/critical items. Record the remaining WARN items with a justification.
 - [ ] MCP `list_tables` shows six tables with `rls_enabled: true`.
 - [ ] Deploy functions: `supabase functions deploy admin-create-user` and `supabase functions deploy finalize-certificate` (`--use-api` if Docker is unavailable). Requires owner approval.
-- [ ] Full verification: `supabase test db` and `deno test supabase/functions`, with the output summary recorded.
+- [ ] Full verification: `supabase test db --remote` and `deno test supabase/functions`, with the output summary recorded.
 - [ ] Update `docs/PROGRESS.md` and `docs/SKILLS_LOG.md` (SKILLS APPLIED). Write the P1 report. Commit `docs(p1): phase report and evidence`.
 
 ---
@@ -451,5 +461,5 @@ Field choices to confirm (not financial and not certificate fields):
 
 ## Environment blockers
 
-- **Docker is not installed.** `supabase start` and local `supabase test db` / `db advisors` need Docker Desktop. The alternative is testing directly on DEV with `--remote`, which pushes every migration iteration to DEV.
+- **Docker:** not installed; resolved by testing on DEV (see Test Environment).
 - **Deno is not installed.** It is needed for Edge Function unit tests (`deno test`).
