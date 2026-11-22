@@ -179,7 +179,7 @@ Tests (write first, watch them fail):
   - `submitted_at timestamptz`, `locked_at timestamptz`
   - `deleted_at timestamptz`, `deleted_by uuid references profiles`
   - `created_at`, `updated_at`
-  - `unique (site_id, period_year, period_month, period_half)`
+  - uniqueness: `create unique index certificates_one_per_period on certificates (site_id, period_year, period_month, period_half) where deleted_at is null` (a soft-deleted certificate does not block its period; Q13)
 - Column grants for `authenticated`:
   - `grant select` on all columns;
   - `grant insert (site_id, certificate_date, amount, notes)`;
@@ -243,6 +243,7 @@ Tests:
 | `return_certificate(p_id uuid, p_note text)` | admin | `in_review` → `returned` | `p_note` non-blank, else `return_note_required`; sets `return_note` |
 | `approve_for_signing(p_id uuid)` | admin | `in_review` → `awaiting_signature` | |
 | `reopen_certificate(p_id uuid, p_reason text)` | admin | `approved` → `returned` | `p_reason` non-blank, else `reopen_reason_required`; clears `locked_at`; reason goes to the audit row |
+| `delete_certificate(p_id uuid, p_reason text default null)` | site_user with site access, status not `approved`; admin, status `approved` (Q13) | soft delete: sets `deleted_at`, `deleted_by` (status unchanged) | `already_deleted` if `deleted_at` is set; reason goes to the audit row; attachments and files are kept |
 
 Errors: `forbidden` (wrong role or no site access), `invalid_transition` (wrong from-status), `not_found`.
 
@@ -260,6 +261,9 @@ Tests:
 - Reopen with a blank reason gets `reopen_reason_required`.
 - After reopen, the site user can edit `amount`.
 - `anon` cannot execute the wrappers.
+- A site user deletes a certificate in `draft`, `in_review`, `returned` and `awaiting_signature`: the row becomes invisible to them, the row still exists (checked as `postgres`), and there is 1 audit row.
+- A site user deleting an `approved` certificate gets `forbidden`. An admin deleting an `approved` certificate succeeds.
+- After a soft delete, the site can create a new certificate for the same period only if the unique key ignores deleted rows (see Task 3 change below).
 
 - [ ] Steps: as in Task 2. Commit `feat(p1): status transition RPCs with audit`.
 
@@ -397,7 +401,7 @@ Steps:
 - Flow:
   1. Resolve the caller. It must be an active admin, checked by reading `profiles` with the caller's user-scoped client so RLS applies. Otherwise 403.
   2. Validate the body: 400 on bad email, empty name, unknown role, or non-uuid site ids.
-  3. `serviceClient.auth.admin.createUser(...)`. The credential method is **blocked on open question Q11**.
+  3. `serviceClient.auth.admin.inviteUserByEmail(email, { redirectTo })` (Q11: email invite). `redirectTo` comes from the `INVITE_REDIRECT_URL` function secret; if it is missing the function returns 500 `config_missing` (no fallback URL). DEV needs Auth SMTP or the built-in mailer (rate-limited, fine for DEV); the owner sets this in the dashboard.
   4. Insert `profiles` and `user_sites` with the service client.
   5. On failure after the user is created, delete that auth user (compensation) and return 500.
   6. Return 201 `{ id }`.
@@ -436,9 +440,9 @@ Verify by starting the local stack fresh (`supabase stop --no-backup` then `supa
 
 ## New open questions raised by this plan
 
-- **Q11. New-user credentials.** How does a user created by the admin sign in the first time? Choices: (a) the admin types a temporary password that the user must change; (b) an email invite link (needs SMTP set up on Supabase). This blocks Task 9 step 3 only.
-- **Q12. Who submits an admin-entered certificate?** The plan lets the admin enter a certificate, and the workflow says the site user submits. This plan assumes the site user submits it.
-- **Q13. Deleting a certificate.** Soft-delete columns exist. Who may soft-delete a certificate, and in which statuses? This plan adds no delete path until answered.
+- **Q11 (answered 22 Nov 2026):** new users get an email invite.
+- **Q12 (answered 22 Nov 2026):** keep the assumption (the site user submits); the owner will check it when testing.
+- **Q13 (answered 22 Nov 2026):** the site user can delete a certificate until it is approved; once approved, only the admin can delete it. Soft delete via `delete_certificate` (Task 5).
 - **Q14. Dedup scope.** This plan blocks the same SHA-256 across all active attachments system-wide. Confirm, or limit dedup to one certificate.
 
 Field choices to confirm (not financial and not certificate fields):
