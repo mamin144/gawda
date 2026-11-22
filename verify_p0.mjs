@@ -96,6 +96,10 @@ else {
   log(`  read_only=true:         ${/[?&]read_only=true(&|$)/.test(url) ? "yes" : "NO"}`);
   log(`  project_ref present:    ${/[?&]project_ref=[a-z0-9]+/.test(url) ? "yes" : "NO"}`);
   log(`  forbidden groups:       ${/account|branching|feedback|notebooks/.test(url) ? "YES (remove them)" : "none"}`);
+  // The token must come from the SUPABASE_ACCESS_TOKEN env var, never be written into the file.
+  const auth = ((servers.supabase && servers.supabase.headers) || {}).Authorization || "";
+  log(`  auth header from env:   ${auth === "Bearer ${SUPABASE_ACCESS_TOKEN}" ? "yes" : auth ? "NO (literal token? remove it)" : "none (OAuth)"}`);
+  log(`  literal sbp_ token:     ${/sbp_[0-9a-f]{8,}/.test(JSON.stringify(servers.supabase || {})) ? "YES - remove it" : "none"}`);
   log(`  dart server:            ${servers.dart && servers.dart.command === "dart" && (servers.dart.args || []).includes("mcp-server") ? "OK" : "MISSING"}`);
   log(`  context7 server:        ${servers.context7 && /^https:\/\/mcp\.context7\.com\//.test(servers.context7.url || "") ? "OK" : "MISSING"}`);
 }
