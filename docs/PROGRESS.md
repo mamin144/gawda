@@ -43,6 +43,12 @@
   - `verify_p0.mjs` now checks `.mcp.json`, the `.claude/settings.json` deny rules, `CLAUDE.md`, and the skill copy instead of `opencode.json`. Run result: exit 0, `Missing required: 0`, all Supabase MCP checks `yes`/`none`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 5 OK`, secret scan clean, no `MISSING`/`ERROR`/`WARNING`.
   - Still open for the owner: authenticate the Supabase MCP in Claude Code (OAuth in the browser) and then the harmless read proof (list tables); `supabase login` / `supabase link`.
 
+- Supabase MCP read proof on 22 November 2026 (Claude Code session):
+  - Auth: the project `supabase` server in `.mcp.json` authenticates with `Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}` (personal access token in the owner's Windows user environment, never committed). The first attempt failed with HTTP 401 `JWT could not be decoded` because the Claude app had been started before the variable was set; after a full app restart the server connected.
+  - Scope check: the server exposes only read tools (`list_tables`, `execute_sql`, `list_migrations`, `list_extensions`, `get_advisors`, `query_logs`, `get_project_url`, `get_publishable_keys`, `generate_typescript_types`, `search_docs`); no `apply_migration`, `create_project`, `deploy_edge_function` or branching tools, consistent with `read_only=true` and the `project_ref` scoping.
+  - `list_tables` with `schemas: ["public"]`, `verbose: false` on the DEV project (`kbjsonvnbbhvczttvzhv`) returned `{"tables":[]}`: the `public` schema is empty, as expected before P1 (no migrations applied yet).
+  - Still open for the owner: `supabase login` / `supabase link`.
+
 ## P1: Database and Security (pending)
 - Status: Not started - awaiting owner approval of P0.
 - Requirements: supabase CLI, pgTAP tests, RLS policies, seed data, Edge Functions.
