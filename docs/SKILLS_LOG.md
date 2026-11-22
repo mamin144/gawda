@@ -162,3 +162,15 @@ Applied so far, in the plan only (no code yet):
 - `supabase-postgres-best-practices`: indexes on FK/filter columns, `numeric(18,2)`, generated period columns.
 - `test-driven-development`: every task starts with a failing pgTAP/Deno test.
 - `sharp-edges` / `insecure-defaults`: storage path parser never raises (deny on malformed), no known seed passwords, service-only RPCs, idempotent finalize.
+
+### P1 Task 0: Supabase changelog check (22 November 2026)
+
+`supabase` skill rule "check the changelog first": fetched `https://supabase.com/changelog.md`. Breaking-change entries relevant to RLS, Storage, Data API grants, pgTAP or Edge Functions:
+- 2026-04-28 Data APIs: new `public` tables are not exposed to the Data API by default (enforced on all projects since 2026-10-30). Every P1 table needs explicit `grant`s to `authenticated` (and RLS).
+- 2026-07-22 Database: the version clause of `create extension` is ignored. Do not pin extension versions (`pgtap` is created without one).
+- 2026-11-04 CLI v3: local by default, asks before hosted changes, so remote commands need `--remote` and an explicit confirmation.
+- 2025-03-18 Auth/Storage: no DDL on the `auth`, `storage`, `realtime` schemas. Test helpers only insert rows into `auth.users`; own objects live in `public`, `private`, `tests`.
+- 2026-10-12 TLS (CBC ciphers removed for Auth, Data APIs, Storage, Edge Functions): no action for this project.
+- pgTAP, RLS-specific, Edge Functions-specific: none found.
+
+Applied in Task 0: `test-driven-development` (smoke test written before the `enable_pgtap` migration and run first as RED), `supabase` (`migration new` for the filename, `test db --remote`), `insecure-defaults` / `sharp-edges` (helpers file refuses to create objects unless included inside a test transaction).
