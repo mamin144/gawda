@@ -118,3 +118,26 @@ Final run (fresh terminal, Python on PATH) printed `plugins (V2 array): OK "@tar
 - `flutter-apply-architecture-best-practices`: recorded the owner-approved `flutter_bloc` package decision without falsely claiming a nonexistent BLoC skill is installed.
 - `sharp-edges`: migrated the OpenCode configuration to V2 so secure restrictions use active `permissions` rules instead of obsolete V1 fields that could be silently ignored.
 - All remaining loaded skills: no product or database code exists yet, so their implementation-specific rules were not applied in P0.
+
+## P0 Final Verification — flutter doctor (22 November 2026)
+
+Run from a fresh terminal (PATH rebuilt from the registry, so `D:\Tools\Python313` is active): `flutter doctor -v`, exit code 0.
+
+| Check | Result | Detail |
+|---|---|---|
+| Flutter | OK | 3.47.6 stable at `C:\flutter`, Dart 3.13.5, DevTools 2.60.0 |
+| Windows Version | OK | Windows 11 / 26H2 |
+| Android toolchain | OK | SDK 37.0.0, platform `android-37.0`, build-tools `37.0.0`, emulator 37.2.12.0, JDK 17.0.20.1+1-LTS, all licenses accepted |
+| Chrome (web) | OK | `C:\Program Files\Google\Chrome\Application\chrome.exe` |
+| Visual Studio | FAIL | Not installed — Windows desktop only |
+| Connected device | OK | Windows (desktop), Chrome (web), Edge (web) |
+| Network resources | OK | All available |
+
+**Blocker verdict:** no blocker for Android builds; no blocker for Web builds. The only failing category is Visual Studio, which is required exclusively for Windows desktop apps and is not a project target (Android + Web). It was reported and intentionally not remediated, per the owner's "do not fix it yet" instruction.
+
+### Final P0 evidence in the same pass
+
+- `node verify_p0.mjs` exit 0, 1552 lines, `Missing required: 0`, all 23 required skills `OK`, all 8 required files `OK`, `Stray files in wrong place: none`, `Tracked files that must NOT be tracked: none`, secret scan clean (`sb_secret_` none, JWT none, publishable key none).
+- Supabase MCP checks: `url present: yes`, `read_only=true: yes`, `project_ref present: yes`, `forbidden groups: none`, `plugins (V2 array): OK "@tarquinen/opencode-dcp@latest"`, `permissions (V2 array): OK 11 rules`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 4 OK`.
+- `git status --short` -> clean. `git log --oneline -4` -> `1a35f76`, `b8705ec`, `8ce6580`, `58a9528`.
+- No `MISSING`, `ERROR`, `WARNING`, `plugin entries: none`, or `permission block: NO` line exists in the output.

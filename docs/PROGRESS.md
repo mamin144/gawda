@@ -17,6 +17,14 @@
   `where python` -> `D:\Tools\Python313\python.exe` (first), `where python3` -> `D:\Tools\Python313\python3.exe` (first), `python --version` -> `Python 3.13.17`, `python3 --version` -> `Python 3.13.17`. Both exit code 0. The Microsoft Store stubs remain in `PATH` but are shadowed.
 - P0 evidence pass on 22 November 2026: `opencode mcp list` -> context7, dart, supabase all `connected`; `opencode plugin list` -> `opencode-dcp 3.2.1`; `supabase --version` -> `3.2.0`; `node verify_p0.mjs` -> `Missing required: 0` (23/23 skills), all 8 required files OK, no stray files, `Tracked files that must NOT be tracked: none`, secret scan clean (`sb_secret_` none, JWT none, publishable key none), and `python3 Python 3.13.17` now appears in the tool-version section with no ERROR.
 - `verify_p0.mjs` was fixed on 22 November 2026 (owner-authorized verifier-only change) to validate the OpenCode V2 configuration instead of the retired V1 keys. It now requires a non-empty `"plugins"` array and a `"permissions"` array, and it additionally **enforces** that every forbidden action is still denied (it does not merely look for the block). `opencode.json` was not modified. The two stale lines `plugin entries: none` and `permission block: NO` are gone. Final result: `plugins (V2 array): OK "@tarquinen/opencode-dcp@latest"`, `permissions (V2 array): OK 11 rules`, `deny shell actions: all 4 OK`, `deny secret/file reads: all 4 OK`, and the full run contains no `MISSING`, `ERROR`, `WARNING`, `plugin entries: none`, or `permission block: NO`.
+- Flutter toolchain verified with `flutter doctor -v` on 22 November 2026 (exit 0, fresh terminal):
+  - `[√] Flutter` — 3.47.6 stable at `C:\flutter`, Dart 3.13.5, DevTools 2.60.0; feature flags include `enable-web` and `enable-android`.
+  - `[√] Android toolchain` — SDK 37.0.0 at `C:\Users\PC-01\AppData\Local\Android\sdk`, platform `android-37.0`, build-tools `37.0.0`, emulator 37.2.12.0, Java `C:\jdk-17\jdk-17.0.20.1+1\bin\java` (OpenJDK 17.0.20.1+1-LTS), "All Android licenses accepted."
+  - `[√] Chrome` — `C:\Program Files\Google\Chrome\Application\chrome.exe`, web target available.
+  - `[X] Visual Studio` — not installed; affects **Windows desktop only**.
+  - `[√] Connected device` — Windows (desktop), Chrome (web), Edge (web).
+  - `[√] Network resources` — all available.
+  - **Blocker assessment: no blocker for Android builds and no blocker for Web builds.** The single `[X]` is Windows desktop, which is not a target of this project (Android + Web per `docs/OPEN_QUESTIONS.md` item 9), so it was reported and deliberately not "fixed".
 
 ## P1: Database and Security (pending)
 - Status: Not started - awaiting owner approval of P0.
