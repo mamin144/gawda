@@ -34,12 +34,18 @@
 |---|---|---|---|
 | declarative-routing | flutter-setup-declarative-routing | Close match; `flutter-setup-declarative-routing` configures go_router which is the planned routing solution | Exact name difference, functionality matches |
 | json-serialization | flutter-implement-json-serialization | Close match; `flutter-implement-json-serialization` maps JSON keys to classes manually with `dart:convert` (`fromJson`/`toJson`) | Exact name difference; note it does NOT cover `freezed`/`json_serializable` codegen |
+| flutter-responsive-layout | flutter-build-responsive-layout | `flutter-responsive-layout` does not exist upstream. `npx skills add flutter/agent-plugins --list` (re-run 22 Nov 2026) shows only two layout skills: `flutter-build-responsive-layout` (adaptive layouts with `LayoutBuilder`/`MediaQuery`) and `flutter-fix-layout-issues` (overflow/unbounded-constraint fixes) | Single skill kept; there is no duplicate. Earlier reports listing both names were wrong |
 
 ## Skills With No Available Install (documented gap, not a mapping)
 
 | Expected Name | Status | Evidence |
 |---|---|---|
-| flutter-bloc | NOT INSTALLED - no BLoC skill exists upstream | `npx skills add flutter/agent-plugins --list` returns 25 skills, none BLoC/Cubit related. `flutter-apply-architecture-best-practices` (the closest candidate) contains 0 matches for `bloc` or `cubit`. Escalated as an open P2 question in `docs/OPEN_QUESTIONS.md`; no substitute is claimed. |
+| flutter-bloc | NOT INSTALLED - no BLoC skill exists upstream | `npx skills add flutter/agent-plugins --list` returns 25 skills, none BLoC/Cubit related. `flutter-apply-architecture-best-practices` (the closest candidate) contains 0 matches for `bloc` or `cubit`. No substitute is claimed. Owner approved the `flutter_bloc` package without a skill as a documented exception on 22 Nov 2026 (closed in `docs/OPEN_QUESTIONS.md`); in P2 check `flutter_bloc` APIs with Context7. |
+| static-analysis (optional) | NOT INSTALLED | Optional per `docs/OPENCODE_PROMPT.md` 1.4 ("use only if Semgrep is installable for free"). Only needed in P7; decide there. |
+
+## Superpowers delivery note
+
+The prompt (1.4 / 1.6) says superpowers is delivered as an OpenCode plugin. It is installed here as the 8 project skills under `.agents/skills/` (source `obra/superpowers`, recorded in `skills-lock.json`); `opencode plugin list` shows only `opencode-dcp`, so the superpowers *plugin* is not installed. The skills load with the `skill` tool, which is what the phases require.
 
 ## Skills Log Summary
 

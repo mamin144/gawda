@@ -1,17 +1,19 @@
-# Environment files
+# Environment files and secrets
 .env*
-/app/env/
+# Flutter env files hold URL + publishable key; only the placeholder example is committed (P2)
+/app/env/*
+!/app/env/*.example.json
 *.xlsx
 *.xlsm
 
-# Build outputs
-/build/
-/.dart_tool/
-/.firebase/
+# Build outputs (any depth, so app/build and app/.dart_tool are covered too)
+build/
+.dart_tool/
+.firebase/
 
-# Supabase outputs
-/functions/**
-/storage/**/.private/
+# Supabase CLI local state (never committed; supabase/functions and migrations ARE committed)
+supabase/.temp/
+supabase/.branches/
 
 # IDE
 .vscode/

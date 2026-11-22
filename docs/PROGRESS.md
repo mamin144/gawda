@@ -26,6 +26,14 @@
   - `[√] Network resources` — all available.
   - **Blocker assessment: no blocker for Android builds and no blocker for Web builds.** The single `[X]` is Windows desktop, which is not a target of this project (Android + Web per `docs/OPEN_QUESTIONS.md` item 9), so it was reported and deliberately not "fixed".
 
+- Independent review on 22 November 2026 (Claude Code session, owner-requested). Re-ran `node verify_p0.mjs` (exit 0, `Missing required: 0`), `opencode mcp list` (context7, dart, supabase `connected`), `opencode plugin list` (`opencode-dcp 3.2.1`). Gaps found and fixed:
+  - `supabase/.temp/cli-latest` (Supabase CLI local state) was tracked in Git; untracked and `supabase/.temp/` + `supabase/.branches/` ignored.
+  - `.gitignore` had `/app/env/`, which would also have ignored the placeholder `app/env/dev.example.json` that P2 must commit; now `/app/env/*` with `!/app/env/*.example.json`.
+  - `/build/` and `/.dart_tool/` were anchored to the repo root and did not cover `app/build` or `app/.dart_tool`; now unanchored.
+  - Removed `/functions/**` and `/storage/**/.private/` (they matched nothing and looked like they might hide `supabase/functions`, which must be committed).
+  - `docs/SKILLS_LOG.md`: logged the `flutter-responsive-layout` -> `flutter-build-responsive-layout` mapping (no `flutter-responsive-layout` upstream), updated the stale `flutter-bloc` row, logged the optional `static-analysis` status and the superpowers skills-vs-plugin note.
+  - Still open for the owner: the Supabase MCP "harmless read call" proof (for example list tables) has not been pasted yet; `opencode mcp list` only shows it is authenticated and connected. `supabase login` / `supabase link` not done yet (owner types the DB password in the terminal). Section 1.6 items: superpowers plugin not installed (skills are), `opencode-notifier` not installed (optional), Envsitter Guard not installed (replaced by read-deny permissions).
+
 ## P1: Database and Security (pending)
 - Status: Not started - awaiting owner approval of P0.
 - Requirements: supabase CLI, pgTAP tests, RLS policies, seed data, Edge Functions.
@@ -35,6 +43,14 @@
 - Status: Not started.
 - Requirements: Flutter project creation, Auth setup, go_router, state management, localization.
 - State-management decision: use `flutter_bloc` as approved by the owner; the project does not depend on a separate unavailable `flutter-bloc` skill.
+
+### P2 notes (recorded during P0; do not act on them before P2)
+- Supabase DEV project URL: `https://kbjsonvnbbhvczttvzhv.supabase.co` (project_ref `kbjsonvnbbhvczttvzhv`).
+- URL and publishable key: stored in `app/env/dev.json` (gitignored). Commit only `app/env/dev.example.json` with placeholders. Run with `--dart-define-from-file=env/dev.json`. No key is ever committed.
+- Before writing the init code, check the current `Supabase.initialize(...)` parameter names of `supabase_flutter` with the Context7 MCP (the dashboard quickstart uses `url` + `publishableKey`; older versions used `anonKey`).
+- Do NOT use the Supabase quickstart `todos` sample code or table. The schema comes only from `supabase/migrations/`.
+- Never use secret / `service_role` keys in the app.
+- `docs/DESIGN_SYSTEM.md` (from `ui-ux-pro-max`) must exist before any UI code.
 
 ## P3-P7: Pending
 - Status: Not started.
