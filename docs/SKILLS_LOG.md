@@ -56,3 +56,19 @@
 - Enable RLS on every table (from supabase-postgres-best-practices)
 - Invoke skills before any response/action (from using-superpowers)
 - Verify before claiming completion (from verification-before-completion)
+
+## P0 Remediation — 22 November 2026
+
+### Skills Loaded
+
+`using-superpowers`, `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `flutter-apply-architecture-best-practices`, `flutter-setup-declarative-routing`, `flutter-implement-json-serialization`, `flutter-build-responsive-layout`, `flutter-add-widget-test`, `dart-run-static-analysis`, `dart-use-pattern-matching`, `dart-add-unit-test`, `dart-fix-runtime-errors`, `supabase`, `supabase-postgres-best-practices`, `ui-ux-pro-max`, `insecure-defaults`, `sharp-edges`, `audit-context-building`.
+
+### Skills Applied
+
+- `writing-plans`: recorded the narrowly scoped P0 remediation plan before modifying project records.
+- `systematic-debugging`: traced the Supabase CLI verification failure to its blocked local telemetry write rather than treating it as a project failure.
+- `verification-before-completion`: verified the installed Supabase package (`3.2.0`), available skill directories, Git state, and C: free space from live command output; did not claim P0 complete.
+- `supabase`, `supabase-postgres-best-practices`, `insecure-defaults`, and `sharp-edges`: retained the private, read-only project-scoped MCP posture and did not introduce credentials, permissive access, or schema changes.
+- `ui-ux-pro-max`: retained `python3` as a prerequisite for P2 rather than bypassing its required helper.
+- `flutter-apply-architecture-best-practices`: recorded the owner-approved `flutter_bloc` package decision without falsely claiming a nonexistent BLoC skill is installed.
+- All remaining loaded skills: no product or database code exists yet, so their implementation-specific rules were not applied in P0.
