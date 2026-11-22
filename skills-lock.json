@@ -1,0 +1,124 @@
+{
+  "version": 2,
+  "skills": {
+    "brainstorming": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/brainstorming/SKILL.md",
+      "computedHash": "a7424777b7f81e3eb9b4556d29fe233553736d8255780d3e1feea190fef61fef"
+    },
+    "dart-run-static-analysis": {
+      "source": "dart-lang/skills",
+      "commit": "f84b16872b5d186f4e877511b49b93c204a1c4ef",
+      "sourceType": "github",
+      "skillPath": "skills/dart-run-static-analysis/SKILL.md",
+      "computedHash": "fa93216b2e985fe86cffbc7f9734361205cbe6c7c8d46b21a87beea19bea2066"
+    },
+    "dart-use-pattern-matching": {
+      "source": "dart-lang/skills",
+      "commit": "f84b16872b5d186f4e877511b49b93c204a1c4ef",
+      "sourceType": "github",
+      "skillPath": "skills/dart-use-pattern-matching/SKILL.md",
+      "computedHash": "f04e10a491637ab3ffaa4fa49964090d03e8521c9eff7410f7bd37c7eb3d40a7"
+    },
+    "executing-plans": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/executing-plans/SKILL.md",
+      "computedHash": "58b364f6e3f64602c7cfd0b34ceaad9de95d41fe7e4b46b274843ba19fc01ccc"
+    },
+    "flutter-add-widget-test": {
+      "source": "flutter/agent-plugins",
+      "commit": "ff6d472ee66dbed566c4500edee460c94fde0a02",
+      "sourceType": "github",
+      "skillPath": "skills/flutter-add-widget-test/SKILL.md",
+      "computedHash": "5cfab5fd20d6b84e28e9b9cc278ac0c3fb2c89a7e850f2b900749b14cb367bbf"
+    },
+    "flutter-apply-architecture-best-practices": {
+      "source": "flutter/agent-plugins",
+      "commit": "ff6d472ee66dbed566c4500edee460c94fde0a02",
+      "sourceType": "github",
+      "skillPath": "skills/flutter-apply-architecture-best-practices/SKILL.md",
+      "computedHash": "a41b999109cc3c2dc79ddbc05b5fd5f39ed08d5c6c17dab728a6b926d3a504de"
+    },
+    "flutter-build-responsive-layout": {
+      "source": "flutter/agent-plugins",
+      "commit": "ff6d472ee66dbed566c4500edee460c94fde0a02",
+      "sourceType": "github",
+      "skillPath": "skills/flutter-build-responsive-layout/SKILL.md",
+      "computedHash": "bdb7ab7ca812ee719237a718376a5f2e15b659201ff66818f1012c5d13751487"
+    },
+    "flutter-implement-json-serialization": {
+      "source": "flutter/agent-plugins",
+      "commit": "ff6d472ee66dbed566c4500edee460c94fde0a02",
+      "sourceType": "github",
+      "skillPath": "skills/flutter-implement-json-serialization/SKILL.md",
+      "computedHash": "48727033cb05de551ef14264112e36e8aec015b3cf955fa2115cfdac6094fe69"
+    },
+    "flutter-setup-declarative-routing": {
+      "source": "flutter/agent-plugins",
+      "commit": "ff6d472ee66dbed566c4500edee460c94fde0a02",
+      "sourceType": "github",
+      "skillPath": "skills/flutter-setup-declarative-routing/SKILL.md",
+      "computedHash": "566264ee0f746a8b4d571a0dec69d3d3f09c246591a3393d1fb67783661465bf"
+    },
+    "supabase": {
+      "source": "supabase/agent-skills",
+      "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "sourceType": "github",
+      "skillPath": "skills/supabase/SKILL.md",
+      "computedHash": "2fbff32fd63b7d31585cacf0ed43e5bf8d05dd20d6c0c751d256cb967a00eec1"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "sourceType": "github",
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
+      "computedHash": "3eb972c2d7c818e544e35cc33ea8d7147d4d78ae08142ef40037b0fbac7a2505"
+    },
+    "systematic-debugging": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/systematic-debugging/SKILL.md",
+      "computedHash": "79ff0583175346e39431b0dc713b223edd1bd7a7ea2b6c8b78b2fb9a3fed6782"
+    },
+    "test-driven-development": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "2782702b2cf69ace085ed30d067b6f8bfd2d777ad51770fc5bdae9cb5c1b5c04"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "6ec2bb58334ca3014573c4cbd4834ee3a40afd9d",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "ecbf45740eab6a35db93506396f68969ad80e2615f24e3c767a4decc9430751c"
+    },
+    "using-superpowers": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/using-superpowers/SKILL.md",
+      "computedHash": "6a9104fac7e16c3cec2bc118943aefd331cac35b4cfabd427cea4dc16337c6a5"
+    },
+    "verification-before-completion": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/verification-before-completion/SKILL.md",
+      "computedHash": "09b0e3a4689c1c38a3b8fc6ef57a1d4165aa33c0013d546dbde9dd348941a319"
+    },
+    "writing-plans": {
+      "source": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "sourceType": "github",
+      "skillPath": "skills/writing-plans/SKILL.md",
+      "computedHash": "ef082ddb5354d736059397133b3682e8a0c85c57906affe47c9da354cbb7c91e"
+    }
+  }
+}

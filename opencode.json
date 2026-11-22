@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@tarquinen/opencode-dcp@latest"],
+  "mcp": {
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=kbjsonvnbbhvczttvzhv&read_only=true&features=docs,database,debugging,development",
+      "enabled": true
+    },
+    "dart": {
+      "type": "local",
+      "command": ["dart", "mcp-server"],
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    }
+  },
+  "permission": {
+    "skill": { "*": "allow" },
+    "bash": { "*": "ask" },
+    "rm -rf": "deny",
+    "git push --force": "deny",
+    "supabase db reset": "deny",
+    "supabase projects delete": "deny",
+    "read .env*": "deny"
+  }
+}
