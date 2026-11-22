@@ -24,26 +24,31 @@
 | subagent-driven-development | Obra/superpowers | .agents/skills/subagent-driven-development | yes | "Use when executing implementation plans with independent tasks in the current session" |
 | dart-add-unit-test | dart-lang/skills | .agents/skills/dart-add-unit-test | yes | "Write and organize unit tests for functions, methods, and classes using `package:test`" |
 | dart-fix-runtime-errors | dart-lang/skills | .agents/skills/dart-fix-runtime-errors | yes | "Uses get_runtime_errors and lsp to fetch an active stack trace, locate the failing line, apply a fix, and verify resolution" |
-| insecure-defaults | trailofbits/skills | .agents/skills/insecure-defaults | yes | "Identifies error-prone APIs, dangerous configurations, and footgun designs that enable security mistakes" |
-| sharp-edges | trailofbits/skills | .agents/skills/sharp-edges | yes | "Identifies error-prone APIs, dangerous configurations, and footgun designs that enable security mistakes" |
+| sharp-edges | trailofbits/skills | .agents/skills/sharp-edges | yes | "Identifies error-prone APIs, dangerous configurations, and footgun designs that enable security mistakes. Use when reviewing API designs, configuration schemas, cryptographic library ergonomics" |
+| insecure-defaults | trailofbits/skills (plugin `plugins/insecure-defaults`, vendored) | .agents/skills/insecure-defaults | yes | "Detect insecure default configuration in a codebase - fallback secrets, seeded default credentials, fail-open switches, weak crypto, permissive access, and debug leakage" |
 | audit-context-building | trailofbits/skills | .agents/skills/audit-context-building | yes | "Enables ultra-granular, line-by-line code analysis to build deep architectural context before vulnerability or bug finding" |
 
 ## Mapped / Renamed Skills (not exact match)
 
 | Expected Name | Actual Skill | Reason | Mapping Note |
 |---|---|---|---|
-| flutter-bloc | flutter-apply-architecture-best-practices | Skill not found as `flutter-bloc`; equivalent coverage through architecture skill that includes BLoC patterns | Uses `flutter-apply-architecture-best-practices` as substitute |
 | declarative-routing | flutter-setup-declarative-routing | Close match; `flutter-setup-declarative-routing` configures go_router which is the planned routing solution | Exact name difference, functionality matches |
-| json-serialization | flutter-implement-json-serialization | Close match; `flutter-implement-json-serialization` covers `freezed` + `json_serializable` pattern | Exact name difference, serialization logic matches |
+| json-serialization | flutter-implement-json-serialization | Close match; `flutter-implement-json-serialization` maps JSON keys to classes manually with `dart:convert` (`fromJson`/`toJson`) | Exact name difference; note it does NOT cover `freezed`/`json_serializable` codegen |
+
+## Skills With No Available Install (documented gap, not a mapping)
+
+| Expected Name | Status | Evidence |
+|---|---|---|
+| flutter-bloc | NOT INSTALLED - no BLoC skill exists upstream | `npx skills add flutter/agent-plugins --list` returns 25 skills, none BLoC/Cubit related. `flutter-apply-architecture-best-practices` (the closest candidate) contains 0 matches for `bloc` or `cubit`. Escalated as an open P2 question in `docs/OPEN_QUESTIONS.md`; no substitute is claimed. |
 
 ## Skills Log Summary
 
-- **Total skills installed**: 24 (22 required + 2 mapped/substitutes)
-- **All required P0 skills verified**: Yes
+- **Total skills installed**: 23 (23 required, 0 extras)
+- **All required P0 skills verified**: Yes (23/23 loadable via the `skill` tool; `flutter-bloc` has no upstream skill and is logged as an explicit gap above)
 - **MCP servers**: Configured and connected (supabase read-only, dart local, context7 remote)
 - **Git repo**: Initialized with first commit
-- **docs/ layout**: All required files in place (AGENTS.md, PROJECT_PLAN.md, OPENCODE_PROMPT.md, OPEN_QUESTIONS.md, PROGRESS.md, SKILLS_LOG.md)
-- **.gitignore**: Correctly ignores .env*, *.xlsx, *.xlsm, build outputs
+- **docs/ layout**: Required files in place (`PROJECT_PLAN.md`, `OPENCODE_PROMPT.md`, `OPEN_QUESTIONS.md`, `PROGRESS.md`, `SKILLS_LOG.md`); `AGENTS.md` lives at the repo root (required by `verify_p0.mjs`)
+- **.gitignore**: Correctly ignores `.env*`, `/app/env/`, `*.xlsx`, `*.xlsm`, build outputs
 
 ## Key Security Rules Logged
 
