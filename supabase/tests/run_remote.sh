@@ -34,21 +34,34 @@ fi
 export PGSSLMODE=require
 failed=0
 total=0
+# psql error lines only ("psql:<file>:<line>: ERROR: ..." or a bare
+# "ERROR: ..."), so a TAP description that mentions "ERROR:" is not a failure.
+psql_error_re='^(psql:.*:[0-9]+: )?(ERROR|FATAL):'
+
 for f in "${files[@]}"; do
   name="$(basename "$f" .test.sql)"
+  total=$((total + 1))
+  # Every file must open a transaction first so the run always rolls back.
+  first_stmt="$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$f" \
+    | grep -vE '^(--.*)?$' | head -1 | tr '[:upper:]' '[:lower:]')"
+  if [[ "$first_stmt" != "begin;" ]]; then
+    echo "$name ... FAIL"
+    echo "    refused: first SQL statement must be 'begin;' (found: '${first_stmt}')"
+    failed=$((failed + 1))
+    continue
+  fi
   out="$("$psql_bin" "$url" -w -X -q -t -A -v ON_ERROR_STOP=1 -f "$f" 2>&1)"
   rc=$?
   passed="$(grep -cE '^ok [0-9]+' <<<"$out")"
   planned="$(grep -oE '^1\.\.[0-9]+' <<<"$out" | head -1 | cut -d. -f3)"
-  if [[ $rc -ne 0 ]] || grep -qE '^not ok|Looks like you|ERROR:' <<<"$out" \
+  if [[ $rc -ne 0 ]] || grep -qE "^not ok|Looks like you|$psql_error_re" <<<"$out" \
      || [[ -z "$planned" || "$passed" != "$planned" ]]; then
     echo "$name ... FAIL"
-    grep -E '^not ok|^#|ERROR:|FATAL:|psql:' <<<"$out" | sed 's/^/    /'
+    grep -E "^not ok|^#|$psql_error_re|^psql:" <<<"$out" | sed 's/^/    /'
     failed=$((failed + 1))
   else
     echo "$name ... ok ($passed tests)"
   fi
-  total=$((total + 1))
 done
 
 if [[ $failed -eq 0 ]]; then

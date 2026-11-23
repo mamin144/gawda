@@ -57,13 +57,15 @@ begin
 end;
 $$;
 
--- Returns to the session role (the role that runs the tests).
+-- Returns to the session role (the role that runs the tests) and clears
+-- the JWT claims set by act_as.
 create or replace function tests.reset_role()
 returns void
 language plpgsql
 as $$
 begin
   reset role;
+  perform set_config('request.jwt.claims', '', true);
 end;
 $$;
 

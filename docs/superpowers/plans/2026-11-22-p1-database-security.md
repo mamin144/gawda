@@ -22,7 +22,8 @@
 Tests and migrations run **remotely on the DEV project** (`kbjsonvnbbhvczttvzhv`); there is no local Docker stack.
 - One-time: the owner runs `supabase link --project-ref kbjsonvnbbhvczttvzhv` and types the DB password in the terminal (never in chat, never stored in the repo).
 - Apply: `supabase db push --dry-run`, then `supabase db push` (asks for approval every time).
-- Test: `supabase test db --remote`. Every pgTAP file runs in one transaction ending in `rollback`, so test users, sites and objects never persist on DEV.
+- Test: `bash supabase/tests/run_remote.sh` (ruling R10: it replaces `supabase test db --remote`, which needs Docker for `pg_prove`; the runner uses the local psql client, the linked pooler URL and the owner's pgpass). Every pgTAP file runs in one transaction ending in `rollback`, so test users, sites and objects never persist on DEV. The runner refuses, and counts as FAIL, any file whose first SQL statement is not `begin;`.
+- Test-file convention (every `supabase/tests/database/*.test.sql`): `begin;`, then `\set tests_in_transaction true`, then `\ir _helpers.sql`, then `select plan(N);` ... `select * from finish();`, then `rollback;`. `_helpers.sql` creates nothing unless `tests_in_transaction` is set.
 - Advisors: `supabase db advisors --remote --type all` and MCP `get_advisors`.
 - Migrations are forward-only: a pushed migration is never edited. A mistake is fixed by a new migration. `supabase db reset` stays denied.
 - Before each push, the task's migration is reviewed against its tests (RED first: tests run against DEV before the push and must fail for the expected reason).
