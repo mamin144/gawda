@@ -12,8 +12,15 @@
 
 create schema if not exists tests;
 
--- Creates an auth user and returns its id. Task 2 adds the profile insert.
-create or replace function tests.create_user(email text)
+-- Creates an auth user and returns its id. When role is given it also
+-- creates the matching public.profiles row (full_name = email). Runs as the
+-- session role (the test owner), which bypasses RLS on purpose.
+drop function if exists tests.create_user(text);
+create or replace function tests.create_user(
+  email text,
+  role public.user_role default null,
+  active boolean default true
+)
 returns uuid
 language plpgsql
 as $$
@@ -26,8 +33,12 @@ begin
     '00000000-0000-0000-0000-000000000000',
     'authenticated',
     'authenticated',
-    email
+    create_user.email
   );
+  if create_user.role is not null then
+    insert into public.profiles (id, full_name, role, is_active)
+    values (new_id, create_user.email, create_user.role, create_user.active);
+  end if;
   return new_id;
 end;
 $$;

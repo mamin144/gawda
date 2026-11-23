@@ -176,3 +176,11 @@ Applied so far, in the plan only (no code yet):
 Applied in Task 0: `test-driven-development` (smoke test written before the `enable_pgtap` migration; RED was not observed at the pgTAP level: the one `supabase test db --remote` attempt stopped at the CLI v3 agent consent gate before any test ran, and that command needs Docker anyway), `supabase` (`migration new` for the filename; verification uses `bash supabase/tests/run_remote.sh`, the R10 psql fallback because there is no Docker), `insecure-defaults` / `sharp-edges` (helpers file refuses to create objects unless included inside a test transaction).
 
 Commit 2b3406f (controller, ruling R10): `supabase/tests/run_remote.sh` runs each `supabase/tests/database/*.test.sql` with the local psql 17 client against the linked pooler URL (no password in the URL; the password comes from the owner's pgpass, never from the repo or the command line). A file passes only when its TAP plan count equals its `ok` count with no `not ok` and no psql error. Fix round 1 hardened it: files whose first SQL statement is not `begin;` are refused and counted as FAIL (every remote run rolls back), and error detection is anchored to psql error lines (`^(psql:[^ ]* )?(ERROR|FATAL):`) so a test description containing "ERROR:" cannot cause a false FAIL.
+
+### P1 Task 2: profiles, sites, user_sites, authorization helpers (23 November 2026)
+
+SKILLS LOADED: `supabase-postgres-best-practices`, `supabase`, `test-driven-development`.
+SKILLS APPLIED:
+- `supabase`: security definer helpers live in the non-exposed `private` schema with `set search_path = ''` and an explicit `(select auth.uid())` check; `revoke execute from public, anon`; every policy is `to authenticated`; UPDATE policies have USING and WITH CHECK; no `user_metadata`; explicit grants to `authenticated` (new public tables are not auto-exposed) and nothing for `anon`; `migration new` for the filename.
+- `supabase-postgres-best-practices`: `(select ...)` wrapping of `auth.uid()` and of the argument-free helpers in policies; index on `user_sites.site_id` (the PK covers `user_id`); least-privilege column-level UPDATE grants.
+- `test-driven-development`: `02_profiles_sites.test.sql` written and run RED (fails on `relation "public.profiles" does not exist`) before the migration was applied.
