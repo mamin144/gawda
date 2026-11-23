@@ -1,0 +1,30 @@
+{
+  "@@locale": "ar",
+  "appTitle": "نظام متابعة الجودة المالية للمواقع",
+  "loginTitle": "تسجيل الدخول",
+  "emailLabel": "البريد الإلكتروني",
+  "passwordLabel": "كلمة المرور",
+  "loginButton": "دخول",
+  "logoutButton": "تسجيل الخروج",
+  "fieldRequired": "هذا الحقل مطلوب",
+  "invalidEmail": "أدخل بريدًا إلكترونيًا صحيحًا",
+  "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+  "errorNetwork": "تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت",
+  "errorServer": "حدث خطأ في الخادم. حاول مرة أخرى لاحقًا",
+  "errorUnexpected": "حدث خطأ غير متوقع",
+  "errorAccountInactive": "هذا الحساب غير مفعّل. تواصل مع المسؤول",
+  "errorConfig": "إعدادات التطبيق غير مكتملة. تواصل مع المسؤول",
+  "loading": "جارٍ التحميل...",
+  "emptyDefault": "لا توجد بيانات",
+  "retry": "إعادة المحاولة",
+  "adminHomeTitle": "لوحة المسؤول",
+  "siteHomeTitle": "لوحة الموقع",
+  "welcomeUser": "مرحبًا، {name}",
+  "@welcomeUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}
