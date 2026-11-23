@@ -438,14 +438,16 @@ Steps: Deno test first (FAIL), handler, PASS, commit `feat(p1): admin-create-use
 
 Apply with `supabase db push --include-seed` (owner approval), check the rows with MCP `execute_sql` (read-only), then `supabase test db --remote`: PASS. Seed must be idempotent (`on conflict do nothing`). Commit `chore(p1): fake seed data`.
 
+**Executed 23 November 2026:** a read-only verifier (`supabase/tests/seed_verify.sql`) was written and run first (RED: `expected 3 fake auth users, found 0`), then the seed was applied with `supabase db push --include-seed --remote --yes` (dry run first: `"seeds":["supabase/seed.sql"]`, no pending migrations) and the verifier passed. Idempotency was proven by re-running `seed.sql` through `psql` (md5 unchanged) because `db push` skips the seed when the remote is already up to date. Rows were checked with MCP `list_tables` and with an RLS probe per seeded identity. Committed as `chore(p1): fake seed data`.
+
 ### Task 11: Advisors, DEV push, evidence
 
-- [ ] `supabase db advisors --remote --type all --level info`. Fix every security finding (new migration) and re-run until there are 0 security issues.
-- [ ] MCP `get_advisors` (security and performance) on DEV. Fix and re-run until there are no ERROR/critical items. Record the remaining WARN items with a justification.
-- [ ] MCP `list_tables` shows six tables with `rls_enabled: true`.
-- [ ] Deploy functions: `supabase functions deploy admin-create-user` and `supabase functions deploy finalize-certificate` (`--use-api` if Docker is unavailable). Requires owner approval.
-- [ ] Full verification: `supabase test db --remote` and `deno test supabase/functions`, with the output summary recorded.
-- [ ] Update `docs/PROGRESS.md` and `docs/SKILLS_LOG.md` (SKILLS APPLIED). Write the P1 report. Commit `docs(p1): phase report and evidence`.
+- [x] `supabase db advisors --remote --type all --level info`. Fix every security finding (new migration) and re-run until there are 0 security issues.
+- [x] MCP `get_advisors` (security and performance) on DEV. Fix and re-run until there are no ERROR/critical items. Record the remaining WARN items with a justification.
+- [x] MCP `list_tables` shows six tables with `rls_enabled: true`.
+- [x] Deploy functions: `supabase functions deploy admin-create-user` and `supabase functions deploy finalize-certificate` (`--use-api` if Docker is unavailable). Requires owner approval.
+- [x] Full verification: `supabase test db --remote` and `deno test supabase/functions`, with the output summary recorded.
+- [x] Update `docs/PROGRESS.md` and `docs/SKILLS_LOG.md` (SKILLS APPLIED). Write the P1 report. Commit `docs(p1): phase report and evidence`.
 
 ---
 
