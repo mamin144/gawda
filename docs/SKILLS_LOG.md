@@ -266,3 +266,43 @@ SKILLS APPLIED:
 - `supabase`: deployed with `--use-api` because Docker is unavailable, naming both functions explicitly instead of "deploy all" and without `--prune`, so nothing can be deleted; `verify_jwt` was left at the platform default (`true`) because both functions are called by signed-in users; the platform-provided `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS` are present (listed only as digests), so no legacy key fallback is needed.
 - `supabase-postgres-best-practices`: advisors re-read after seeding; 0 security ERROR/CRITICAL. The 5 unindexed-FK and 2 unused-index items stay INFO and are accepted: those foreign keys (`created_by`, `deleted_by`, `uploaded_by`, `actor_id`) are never used as filter predicates, and the two indexes serve planned screens rather than the current empty tables. No index was added for a hypothetical query.
 - `insecure-defaults`: two gaps were found and are reported to the owner instead of being papered over — the project-level `auth_leaked_password_protection` WARN (enable HaveIBeenPwned checking in the dashboard) and the missing `INVITE_REDIRECT_URL` function secret, which makes `admin-create-user` answer `500 config_missing` by design rather than falling back to a default URL. The RLS probe also confirms the seed grants no cross-site visibility (site2 sees 0 of site1's 5 certificates).
+## P2: App Foundation (23 November 2026)
+
+Phase skills loaded at start (per docs/OPENCODE_PROMPT.md "Skills per phase" + mandatory set): `using-superpowers`, `brainstorming`, `audit-context-building`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `writing-plans`, `executing-plans`, `flutter-apply-architecture-best-practices`, `flutter-setup-declarative-routing` (table name `flutter-declarative-routing`), `flutter-implement-json-serialization` (table name `flutter-json-serialization`), `dart-run-static-analysis`, `dart-use-pattern-matching`, `ui-ux-pro-max`, `flutter-build-responsive-layout` (table name `flutter-responsive-layout`), `supabase`. `flutter-bloc` remains the owner-approved documented exception (no such skill exists upstream); `flutter_bloc` is used with the architecture skill's layering.
+
+### P2 Task 0: design system document
+
+SKILLS LOADED: `ui-ux-pro-max`, `brainstorming`, `writing-plans`.
+SKILLS APPLIED:
+- `ui-ux-pro-max`: ran `--design-system` twice; both outputs (Enterprise Gateway/OLED, then Glassmorphism/Fira Code) were rejected as off-topic per the Query Contract and NOT persisted; the doc labels the style direction as fallback and adopts only verified targeted matches: `minimalism-and-swiss-style` with `rtl_level: full` (`--domain style --rtl=full`), the "Arabic Elegant" pairing (`--domain typography`), IBM Plex Sans Arabic (`--domain google-fonts`), the light Banking/Traditional Finance palette (`--domain color`), form error rules (`--domain ux`), and `Theme.of(context)`/darkTheme/no-hardcoded-colors (`--stack flutter`).
+- `brainstorming`: understanding summary + decision log (D1-D7) written into `docs/DESIGN_SYSTEM.md`; business-fixed rules (status colors, 48dp targets, Western digits default) taken from PROJECT_PLAN.md, not invented.
+- `writing-plans`: phase plan saved to `docs/superpowers/plans/2026-11-23-p2-app-foundation.md` with Global Constraints, Review Focus (5 failure modes pinned to tasks), interfaces and self-review.
+
+### P2 Task 1: scaffold, strict analysis, env config, arabic font
+
+SKILLS LOADED: `flutter-setup-declarative-routing`, `dart-run-static-analysis`, `supabase`, `test-driven-development`, `verification-before-completion`.
+SKILLS APPLIED:
+- `flutter-setup-declarative-routing`: scaffold step exactly as the skill prescribes (`flutter create`, platforms android+web only); `go_router` added now, router configured in Task 7.
+- `dart-run-static-analysis`: `analysis_options.yaml` includes `package:flutter_lints/flutter.yaml`, enables `strict-casts`/`strict-inference`/`strict-raw-types`, excludes `**/*.g.dart`, `**/*.freezed.dart`, `lib/l10n/gen/**`; formatter `page_width: 100`, `trailing_commas: preserve`. `flutter analyze` run after the task: No issues found.
+- `supabase`: publishable key fetched with read-only MCP `get_publishable_keys`; `Supabase.initialize` parameter names verified against the 2.18.3 API docs (`url` + `publishableKey`; `anonKey` deprecated). `AppConfig.parse` rejects `sb_secret_` keys and service_role JWTs so a secret can never reach the client; only `app/env/dev.example.json` is committed (`git check-ignore` proves `dev.json` ignored, example not ignored).
+- `test-driven-development`: `app_config_test.dart` (8 tests) written first and run RED (`'ConfigException' isn't a type`), then minimal implementation, GREEN 8/8.
+- `flutter-build-responsive-layout`: removed the generated `"orientation": "portrait-primary"` lock from `web/manifest.json` (skill: never lock orientation).
+- Deviation (minor, recorded): `AppConfig.fromEnvironment` is a validating factory reading `const String.fromEnvironment`, not a const constructor (validation cannot run in const context).
+
+### P2 Task 2: sealed AppFailure and exception mapper
+
+SKILLS LOADED: `dart-use-pattern-matching`, `test-driven-development`, `supabase`.
+SKILLS APPLIED:
+- `dart-use-pattern-matching`: mapper is a switch expression with object patterns (`AuthException(code: 'invalid_credentials')`, `AuthException(:final code, :final message)`); the sealed hierarchy is matched exhaustively without a default arm in a compile-time test; unknown AuthException codes are preserved in `ServerFailure`, never silently dropped.
+- `test-driven-development`: 8 mapper tests run RED (missing files) before implementation; GREEN 16/16 total.
+- `supabase`: exception constructors verified from the resolved pub-cache sources (`AuthException(message, {statusCode, code})`, `PostgrestException({required message, code, details, hint})`) instead of guessed.
+- Platform correctness: `dart:io` `SocketException` detection lives in a conditional-import helper (`network_error_stub.dart` / `network_error_io.dart`) so the same code compiles for Web and Android.
+
+### P2 Task 3: material 3 theme extensions and arabic rtl localization
+
+SKILLS LOADED: `ui-ux-pro-max`, `dart-run-static-analysis`, `test-driven-development`, `systematic-debugging`.
+SKILLS APPLIED:
+- `ui-ux-pro-max`: every token in `AppTheme`/`AppSpacing`/`AppRadii`/`AppStatusColors` comes from DESIGN_SYSTEM.md (verified palette hex, 4/8/12/16/24/32/48 spacing, 8/12/16 radii, status pairs); 48dp minimum button size enforced in all three button themes; Arabic body height 1.5, letter-spacing 0, no text below 12; light AND dark themes provided (`--stack flutter` rule).
+- `test-driven-development`: theme + l10n tests written first, run RED (both files fail to load), then implementation; GREEN 26/26.
+- `systematic-debugging`: two failures diagnosed from real output before fixing — `gen-l10n` refused without `flutter: generate: true` (added flag), and `ThemeData.fontFamily` is not a getter (test corrected to assert `textTheme.bodyLarge!.fontFamily`); unused-import warning removed; final `flutter analyze` No issues found.
+- All user-facing strings live in `lib/l10n/app_ar.arb`; RTL proven by widget test (`Directionality.of == rtl` under `Locale('ar')`).
