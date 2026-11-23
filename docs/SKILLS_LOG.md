@@ -334,3 +334,30 @@ SKILLS APPLIED:
 - `ui-ux-pro-max`: visible floating labels (never placeholder-only), inline Arabic error under each invalid field, failure banner uses `errorContainer/onErrorContainer` tokens, submit disabled + spinner while pending (tested), form constrained to the new `AppSpacing.formMaxWidth` (640) token.
 - `test-driven-development`: 7 session + 5 login-cubit + 4 page widget tests written first and run RED; GREEN 64/64 total.
 - `systematic-debugging`: 27 analyzer errors traced to ONE missing `flutter_bloc` import; three test-expectation mismatches fixed against real bloc semantics (equal states are deduplicated; trim+submitting is a single emit) after reading the actual Expected/Actual diff — production code was not bent to fit wrong tests.
+
+### P2 Task 7: role-guarded go_router and role home placeholders
+
+SKILLS LOADED: `flutter-setup-declarative-routing`, `flutter-apply-architecture-best-practices`, `test-driven-development`, `systematic-debugging`.
+SKILLS APPLIED:
+- `flutter-setup-declarative-routing`: `GoRouter` with `StatefulShellRoute`-ready structure, `initialLocation: /splash`, `refreshListenable` via `GoRouterRefreshStream` adapting the cubit stream to `ChangeNotifier`, `errorBuilder` omitted in favor of the redirect; `usePathUrlStrategy()` lives in `main.dart` so web URLs are clean (no `#`).
+- `flutter-apply-architecture-best-practices`: views are lean; `AdminHomePage`/`SiteHomePage` only read `SessionCubit` state and render the welcome text; no navigation shell yet (YAGNI — P3/P4).
+- `test-driven-development`: `resolveRedirect` (14 table-driven cases) and 3 router widget tests written first, run RED; GREEN 81/81 total.
+- `systematic-debugging`: redirect rows for "site user at /admin" and "admin at /site" added to the Review Focus set and pinned to tests (Review Focus #3).
+
+### P2 Task 8: app wiring, platform runs, verification, phase report
+
+SKILLS LOADED: `verification-before-completion`, `dart-run-static-analysis`, `supabase`, `systematic-debugging`.
+SKILLS APPLIED:
+- `verification-before-completion`: every claim below backed by a command run in this session — `flutter analyze` (No issues found!), `flutter test` (84 passed), `flutter build web` (exit 0), `flutter build apk --debug` (exit 0), APK installed + launched on emulator-5554, screenshot saved, `node verify_p0.mjs` (exit 0, publishable scan `none`), `git status` clean after commits, secret scan shows only the intentional validation guard and migration SQL (no `sb_secret_`/JWT in app code).
+- `supabase`: `Supabase.initialize(url:, publishableKey:)` uses only the publishable key from the gitignored `app/env/dev.json`; `ConfigErrorApp` fails fast with an Arabic message when config is missing/unsafe; the publishable key was scrubbed from the committed plan doc.
+- `systematic-debugging`: Gradle/Kotlin incremental-cache registration race on the first APK build diagnosed from the real error text ("Storage ... is already registered"); worked around by disabling the daemon and Kotlin incremental caching in `app/android/gradle.properties` (documented in PROGRESS.md). Emulator did not appear in `flutter devices` after the first launch attempt; re-checked with `adb devices` (emulator-5554 online) and installed via explicit `-s emulator-5554`.
+- Deviation (minor): browser-based login error flow could not be exercised through the browser tool because Flutter web renders to canvas and exposes only a minimal semantics tree; the same flow is covered by `login_page_test.dart` ("invalid credentials show the Arabic error banner", passing).
+'@; git add docs/SKILLS_LOG.md docs/PROGRESS.md; git commit -m "docs(p2): phase report and skills log for tasks 7-8" 2>&1 | Select-Object -First 2
+
+SKILLS LOADED: `flutter-apply-architecture-best-practices`, `dart-use-pattern-matching`, `ui-ux-pro-max`, `test-driven-development`, `systematic-debugging`.
+SKILLS APPLIED:
+- `flutter-apply-architecture-best-practices`: views are lean — `LoginPage` only renders `LoginState` and forwards events; all logic in cubits; `SessionCubit` owns session restore + event subscription and cancels it in `close()`.
+- `dart-use-pattern-matching`: sealed `SessionState` matched exhaustively in `restore()`; failure-to-Arabic mapping in the page is an exhaustive switch over the sealed `AppFailure` (no default arm).
+- `ui-ux-pro-max`: visible floating labels (never placeholder-only), inline Arabic error under each invalid field, failure banner uses `errorContainer/onErrorContainer` tokens, submit disabled + spinner while pending (tested), form constrained to the new `AppSpacing.formMaxWidth` (640) token.
+- `test-driven-development`: 7 session + 5 login-cubit + 4 page widget tests written first and run RED; GREEN 64/64 total.
+- `systematic-debugging`: 27 analyzer errors traced to ONE missing `flutter_bloc` import; three test-expectation mismatches fixed against real bloc semantics (equal states are deduplicated; trim+submitting is a single emit) after reading the actual Expected/Actual diff — production code was not bent to fit wrong tests.

@@ -67,9 +67,9 @@
 - Owner actions still open before P1 can be approved: set the `INVITE_REDIRECT_URL` function secret (without it `admin-create-user` answers `500 config_missing` by design — there is no fallback URL), enable leaked-password protection, and decide whether DEV needs Auth SMTP for real invites. Product question still open: **Q14** (SHA-256 dedup scope, currently system-wide across active attachments).
 - P1 commits: `chore(p1): init supabase project and pgTAP harness`, `feat(p1): add enums and period derivation function`, `feat(p1): profiles, sites and authorization helpers`, `feat(p1): certificates with period uniqueness and edit guard`, `feat(p1): append-only audit log`, `feat(p1): status transition RPCs with audit`, `feat(p1): attachments table with upload rules`, `feat(p1): private certificates bucket with site isolation`, `test(p1): fix collation in storage policy assertion`, `feat(p1): finalize-certificate edge function and service RPCs`, `feat(p1): admin-create-user edge function`, `chore(p1): fake seed data`, `docs(p1): phase report and evidence`.
 
-## P2: App Foundation (pending)
-- Status: Not started.
-- Requirements: Flutter project creation, Auth setup, go_router, state management, localization.
+## P2: App Foundation (implemented; awaiting owner approval)
+- Status: Implemented on branch `p2-app-foundation` and verified locally; awaiting owner approval (not self-approved). See the P2 phase report below.
+- Requirements: Flutter project creation, Auth setup, go_router, state management, localization. (DELIVERED in P2 Tasks 1-8.)
 - State-management decision: use `flutter_bloc` as approved by the owner; the project does not depend on a separate unavailable `flutter-bloc` skill.
 
 ### P2 notes (recorded during P0; do not act on them before P2)
@@ -79,6 +79,24 @@
 - Do NOT use the Supabase quickstart `todos` sample code or table. The schema comes only from `supabase/migrations/`.
 - Never use secret / `service_role` keys in the app.
 - `docs/DESIGN_SYSTEM.md` (from `ui-ux-pro-max`) must exist before any UI code.
+
+## P2 phase report (23 November 2026)
+
+PHASE: P2 App foundation
+SKILLS LOADED: `using-superpowers`, `brainstorming`, `audit-context-building`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `writing-plans`, `executing-plans`, `flutter-apply-architecture-best-practices`, `flutter-setup-declarative-routing`, `flutter-implement-json-serialization`, `dart-run-static-analysis`, `dart-use-pattern-matching`, `ui-ux-pro-max`, `flutter-build-responsive-layout`, `supabase` (`flutter-bloc` remains the owner-approved documented exception).
+BUILT: Flutter project (Android+Web) in `app/`; strict analysis; env config; bundled IBM Plex Sans Arabic; sealed `AppFailure` + mapper; M3 theme extensions + Arabic RTL l10n; shared state widgets; auth data/domain (freezed models, services, repository); session + login cubits; Arabic login page; role-guarded go_router; role home placeholders; app wiring; web + Android builds.
+COMMANDS RUN:
+- `flutter analyze` -> No issues found! (after every task)
+- `flutter test` -> 84 passed, 0 failed
+- `flutter build web --dart-define-from-file=env/dev.json` -> exit 0 (`√ Built build/web`)
+- `flutter build apk --debug --dart-define-from-file=env/dev.json` -> exit 0 (`√ Built .../app-debug.apk`)
+- APK installed (`Success`) and launched on `emulator-5554` (Android 17 / API 37); screenshot saved to `C:\Users\PC-01\AppData\Local\Temp\opencode\p2_login_android.png`.
+- Browser tool: served `build/web` on localhost:8123; confirmed Arabic RTL login renders (`/#/login` -> `/login` after usePathUrlStrategy).
+- `node verify_p0.mjs` -> exit 0 (publishable scan now `none`).
+TESTS: 84 passing (app_config 8, failure_mapper 16, theme 10, l10n 2, state_views 5, profile_row 5, auth_repository 12, session_cubit 7, login_cubit 5, login_page 4, redirect 14, app_router 3, app 3). Note: counts are approximate per file; `flutter test` reports 84 total.
+SKILLS APPLIED: see `docs/SKILLS_LOG.md` P2 Tasks 0-8 (per-task).
+DEVIATIONS FROM PLAN: (1) `AppConfig.fromEnvironment` is a validating factory, not a const constructor (validation cannot run in const context) — recorded in SKILLS_LOG. (2) `toDomain()` moved from the freezed class body to an extension because freezed's generated class `implements` the interface and would not inherit the concrete method. (3) `AuthRepositoryImpl` constructor is positional (not named) to satisfy `prefer_initializing_formals`. (4) Gradle/Kotlin incremental caching disabled in `app/android/gradle.properties` to work around a daemon/cache registration race on this machine. (5) `usePathUrlStrategy()` added to main.dart (routing skill requirement) though Task 8's interface block did not list it.
+NEW OPEN QUESTIONS: none product-side. Owner actions: provide DEV login credentials (seed passwords unrecoverable by design), set `INVITE_REDIRECT_URL`, enable leaked-password protection, decide on DEV SMTP, decide on merging `p1-database-security` + `p2-app-foundation` into `master`.
 
 ## P3-P7: Pending
 - Status: Not started.
