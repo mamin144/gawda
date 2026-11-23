@@ -113,9 +113,9 @@ select is_empty(
           'private.is_active_user()', 'private.is_admin()', 'private.has_site_access(uuid)',
         'private.submit_certificate(uuid)', 'private.return_certificate(uuid,text)',
         'private.approve_for_signing(uuid)', 'private.reopen_certificate(uuid,text)',
-        'private.delete_certificate(uuid,text)')
+        'private.delete_certificate(uuid,text)', 'private.attachment_path_matches(text,uuid)')
       )$$,
-  'private functions are not executable by anon; only the RLS helpers and transition functions by authenticated'
+  'private functions are not executable by anon; only the RLS helpers, transition functions and attachment path check by authenticated'
 );
 select ok(
   not has_function_privilege('anon', 'private.guard_certificate_update()', 'execute')
