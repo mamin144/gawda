@@ -2,7 +2,7 @@ begin;
 \set tests_in_transaction true
 \ir _helpers.sql
 
-select plan(48);
+select plan(52);
 
 -- Local helpers (rolled back with the test).
 -- t3.id(name): fixture id stored in a transaction-local setting, readable by any role.
@@ -50,6 +50,7 @@ select set_config('t3.admin', tests.create_user('t3-admin@example.test', 'admin'
 select set_config('t3.s1', tests.create_user('t3-s1@example.test', 'site_user')::text, true);
 select set_config('t3.s2', tests.create_user('t3-s2@example.test', 'site_user')::text, true);
 select set_config('t3.inactive_su', tests.create_user('t3-is@example.test', 'site_user', false)::text, true);
+select set_config('t3.noprofile', tests.create_user('t3-np@example.test')::text, true);
 
 select set_config('t3.site1', gen_random_uuid()::text, true);
 select set_config('t3.site2', gen_random_uuid()::text, true);
@@ -277,12 +278,33 @@ select is(
 );
 select tests.reset_role();
 
--- 43: anon. anon has no usage on schema tests, so return with a plain reset role.
+-- 43-46: auth user without a profile. Precondition: a live site1 certificate
+-- exists, so the 0-row results below cannot pass vacuously.
+select is(
+  (select count(*) from public.certificates where id = t3.id('c_returned') and deleted_at is null),
+  1::bigint,
+  'precondition: a live site1 certificate exists'
+);
+select tests.act_as(t3.id('noprofile'));
+-- Plain queries (no helper that swallows insufficient_privilege).
+select is((select count(*) from public.certificates), 0::bigint, 'user without profile sees 0 certificates');
+select throws_ok(
+  format('insert into public.certificates (site_id, certificate_date, amount) values (%L, %L, 1)', t3.id('site1'), '2026-10-05'),
+  '42501', null, 'user without profile cannot insert a certificate'
+);
+select is(
+  t3.rows_affected(format('update public.certificates set amount = 1 where id = %L', t3.id('c_returned'))),
+  0::bigint,
+  'user without profile update affects 0 rows'
+);
+select tests.reset_role();
+
+-- 47: anon. anon has no usage on schema tests, so return with a plain reset role.
 set local role anon;
 select is(t3.visible_rows('public.certificates'), 0::bigint, 'anon sees 0 certificates');
 reset role;
 
--- 44-46: the guard applies to authenticated/anon only; the session role
+-- 48-50: the guard applies to authenticated/anon only; the session role
 -- (as SECURITY DEFINER RPCs will) can still update a locked certificate.
 select lives_ok(
   format('update public.certificates set amount = 501 where id = %L', t3.id('c_approved')),
@@ -295,7 +317,7 @@ select is(
   'both day-15 and day-16 certificates exist'
 );
 
--- 47-48: column grants for authenticated.
+-- 51-52: column grants for authenticated.
 select ok(
   has_column_privilege('authenticated', 'public.certificates', 'certificate_date', 'update')
   and has_column_privilege('authenticated', 'public.certificates', 'amount', 'update')
