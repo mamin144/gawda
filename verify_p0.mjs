@@ -157,11 +157,17 @@ const hits = { secret: [], service_role: [], jwt: [], publishable: [] };
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
     if (skip.has(e.name)) continue;
     const p = path.join(d, e.name);
-    if (e.isDirectory()) { walk(p); continue; }
+    const rel = path.relative(root, p);
+    if (e.isDirectory()) {
+      // Env files hold keys by design (gitignored) and are not committed source.
+      if (rel === "app" + path.sep + "env") continue;
+      walk(p);
+      continue;
+    }
     let st; try { st = fs.statSync(p); } catch { continue; }
     if (st.size > 1_000_000) continue;
     let t; try { t = fs.readFileSync(p, "utf8"); } catch { continue; }
-    const rel = path.relative(root, p);
+    if (rel.endsWith(".example.json")) continue; // placeholders, not real keys
     if (/sb_secret_[A-Za-z0-9_-]{10,}/.test(t)) hits.secret.push(rel);
     if (/service_role/.test(t) && !/\.md$/.test(rel) && rel !== "verify_p0.mjs") hits.service_role.push(rel);
     if (/eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/.test(t)) hits.jwt.push(rel);
