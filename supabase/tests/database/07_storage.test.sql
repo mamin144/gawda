@@ -126,7 +126,7 @@ select ok(
   'path_site_id is executable by authenticated only (not public, anon, service_role)'
 );
 select results_eq(
-  $$select policyname::text, cmd::text, roles::text from pg_policies
+  $$select policyname::text collate "default", cmd::text, roles::text collate "default" from pg_policies
     where schemaname = 'storage' and tablename = 'objects' and policyname like 'certificates%'
     order by policyname$$,
   $$values ('certificates_objects_insert', 'INSERT', '{authenticated}'),
