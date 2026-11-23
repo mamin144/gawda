@@ -184,3 +184,12 @@ SKILLS APPLIED:
 - `supabase`: security definer helpers live in the non-exposed `private` schema with `set search_path = ''` and an explicit `(select auth.uid())` check; `revoke execute from public, anon`; every policy is `to authenticated`; UPDATE policies have USING and WITH CHECK; no `user_metadata`; explicit grants to `authenticated` (new public tables are not auto-exposed) and nothing for `anon`; `migration new` for the filename.
 - `supabase-postgres-best-practices`: `(select ...)` wrapping of `auth.uid()` and of the argument-free helpers in policies; index on `user_sites.site_id` (the PK covers `user_id`); least-privilege column-level UPDATE grants.
 - `test-driven-development`: `02_profiles_sites.test.sql` written and run RED (fails on `relation "public.profiles" does not exist`) before the migration was applied.
+
+### P1 Task 3: certificates (23 November 2026)
+
+SKILLS LOADED: `supabase-postgres-best-practices`, `supabase`, `test-driven-development`, `verification-before-completion`.
+SKILLS APPLIED:
+- `supabase`: guard trigger function in the non-exposed `private` schema, `security invoker`, `set search_path = ''`, execute revoked from `public, anon, authenticated`; `alter default privileges for role postgres in schema private revoke execute on functions from public` before any new private function (R14); every policy is `to authenticated`; the UPDATE policy has USING and WITH CHECK; `revoke all ... from public, anon, authenticated` (the DEV default ACL hands `anon`/`authenticated` TRUNCATE/REFERENCES/TRIGGER/MAINTAIN on new public tables) then explicit grants; nothing for `anon`; `migration new` for the filename.
+- `supabase-postgres-best-practices`: `numeric(18,2)` with a `check (amount >= 0)`; stored generated period columns; partial unique index (`where deleted_at is null`) whose leading `site_id` column covers the FK; index on `status`; `(select private.is_admin())` wrapping in the trigger; least-privilege column-level INSERT/UPDATE grants (status, site_id, created_by and soft-delete columns are not client-writable).
+- `test-driven-development`: `03_certificates.test.sql` (48 tests) written and run RED against DEV (fails on `relation "public.certificates" does not exist`) before the migration was written; GREEN is run by the controller after `supabase db push` (R1, R11).
+- `verification-before-completion`: no GREEN claim made; only the RED run and read-only checks were executed by the implementer.
