@@ -6,22 +6,8 @@
 // objects keyed by key name; the "default" key is used). No fallback to the
 // legacy SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "@supabase/supabase-js";
+import { parseDefaultKey } from "../_shared/env.ts";
 import { handleFinalize } from "./handler.ts";
-
-function defaultKey(name: string): string | null {
-  const raw = Deno.env.get(name);
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (parsed !== null && typeof parsed === "object") {
-      const key = (parsed as Record<string, unknown>).default;
-      if (typeof key === "string" && key.length > 0) return key;
-    }
-  } catch {
-    // fall through: treated as missing
-  }
-  return null;
-}
 
 const CLIENT_OPTIONS = {
   auth: {
@@ -40,8 +26,10 @@ function misconfigured(): Response {
 
 Deno.serve((req) => {
   const url = Deno.env.get("SUPABASE_URL");
-  const publishableKey = defaultKey("SUPABASE_PUBLISHABLE_KEYS");
-  const secretKey = defaultKey("SUPABASE_SECRET_KEYS");
+  const publishableKey = parseDefaultKey(
+    Deno.env.get("SUPABASE_PUBLISHABLE_KEYS"),
+  );
+  const secretKey = parseDefaultKey(Deno.env.get("SUPABASE_SECRET_KEYS"));
   if (!url || !publishableKey || !secretKey) return misconfigured();
 
   return handleFinalize(req, {
