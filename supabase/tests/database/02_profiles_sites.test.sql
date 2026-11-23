@@ -170,12 +170,16 @@ select ok(not private.is_active_user(), 'private.is_active_user() is false witho
 select ok(not private.has_site_access(t2.id('site1')), 'private.has_site_access() is false without a profile');
 select tests.reset_role();
 
--- 40-42: anon gets a permission error or 0 rows.
+-- 40-42: anon gets a permission error or 0 rows. Only schema t2 (test-only)
+-- is granted to anon; t2.visible_rows catches insufficient_privilege raised by
+-- the table query itself, so it cannot mask a test-schema error.
 set local role anon;
 select is(t2.visible_rows('public.profiles'), 0::bigint, 'anon sees 0 profiles');
 select is(t2.visible_rows('public.sites'), 0::bigint, 'anon sees 0 sites');
 select is(t2.visible_rows('public.user_sites'), 0::bigint, 'anon sees 0 user_sites rows');
-select tests.reset_role();
+-- anon has no usage on schema tests, so return with a plain reset role
+-- (no JWT claims were set for anon).
+reset role;
 
 -- 43-44: anon has no table privileges at all.
 select ok(

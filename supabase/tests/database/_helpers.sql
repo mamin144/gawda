@@ -15,7 +15,9 @@ create schema if not exists tests;
 -- Creates an auth user and returns its id. When role is given it also
 -- creates the matching public.profiles row (full_name = email). Runs as the
 -- session role (the test owner), which bypasses RLS on purpose.
+set local client_min_messages = warning;
 drop function if exists tests.create_user(text);
+reset client_min_messages;
 create or replace function tests.create_user(
   email text,
   role public.user_role default null,
