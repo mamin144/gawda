@@ -86,22 +86,32 @@ select ok(
   'certificates_one_per_period is a unique partial index'
 );
 select has_index('public', 'certificates', 'certificates_status_idx', 'status'::name, 'certificates has an index on status');
-select ok(
-  exists (
-    select 1 from pg_default_acl d
-    where d.defaclrole = 'postgres'::regrole
-      and d.defaclnamespace = 'private'::regnamespace
-      and d.defaclobjtype = 'f'
-      and not exists (select 1 from aclexplode(d.defaclacl) a where a.grantee = 0)
-  ),
-  'pg_default_acl for schema private exists and grants nothing to PUBLIC'
+-- Catch-all guard for schema private. The known functions must exist (so the
+-- guard below cannot pass on an empty or missing schema; 'private'::regnamespace
+-- errors if the schema is gone).
+select set_eq(
+  $$select p.oid::regprocedure::text from pg_proc p
+    where p.pronamespace = 'private'::regnamespace
+      and p.oid::regprocedure::text in (
+        'private.is_active_user()', 'private.is_admin()',
+        'private.has_site_access(uuid)', 'private.guard_certificate_update()')$$,
+  array['private.is_active_user()', 'private.is_admin()',
+        'private.has_site_access(uuid)', 'private.guard_certificate_update()'],
+  'schema private holds the expected helper and trigger functions'
 );
--- A function created by postgres in private is not executable by anon/authenticated by default.
-create function private.t3_probe() returns int language sql as $$ select 1 $$;
-select ok(
-  not has_function_privilege('anon', 'private.t3_probe()', 'execute')
-  and not has_function_privilege('authenticated', 'private.t3_probe()', 'execute'),
-  'new private functions are not executable by anon or authenticated by default'
+-- Offenders are listed by signature and role in the failure diagnostics.
+select is_empty(
+  $$select p.oid::regprocedure::text || ' executable by ' || r.rolname
+    from pg_proc p
+    cross join (values ('anon'), ('authenticated')) as r (rolname)
+    where p.pronamespace = 'private'::regnamespace
+      and has_function_privilege(r.rolname, p.oid, 'execute')
+      and not (
+        r.rolname = 'authenticated'
+        and p.oid::regprocedure::text in (
+          'private.is_active_user()', 'private.is_admin()', 'private.has_site_access(uuid)')
+      )$$,
+  'private functions are not executable by anon; only the three RLS helpers by authenticated'
 );
 select ok(
   not has_function_privilege('anon', 'private.guard_certificate_update()', 'execute')
