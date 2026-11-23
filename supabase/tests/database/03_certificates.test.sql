@@ -110,9 +110,12 @@ select is_empty(
       and not (
         r.rolname = 'authenticated'
         and p.oid::regprocedure::text in (
-          'private.is_active_user()', 'private.is_admin()', 'private.has_site_access(uuid)')
+          'private.is_active_user()', 'private.is_admin()', 'private.has_site_access(uuid)',
+        'private.submit_certificate(uuid)', 'private.return_certificate(uuid,text)',
+        'private.approve_for_signing(uuid)', 'private.reopen_certificate(uuid,text)',
+        'private.delete_certificate(uuid,text)')
       )$$,
-  'private functions are not executable by anon; only the three RLS helpers by authenticated'
+  'private functions are not executable by anon; only the RLS helpers and transition functions by authenticated'
 );
 select ok(
   not has_function_privilege('anon', 'private.guard_certificate_update()', 'execute')
