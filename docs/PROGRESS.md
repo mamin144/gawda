@@ -116,5 +116,17 @@ NEW OPEN QUESTIONS: none product-side. Owner actions: ~~provide DEV login creden
 - Deploy: `admin-create-user` version 2, ACTIVE, verify_jwt true (deployed with `--yes`).
 - Owner actions still open: set `INVITE_REDIRECT_URL`; enable leaked-password protection; decide DEV SMTP; rotate the three DEV seed passwords; decide on merging `p1-database-security` + `p2-app-foundation` + `p3-admin-sites-users` into `master`.
 
-## P4-P7: Pending
+## P4 Site user certificate flow + P3 fix wave: COMPLETE (24 November 2026)
+- Branch `p4-site-user-flow` (not pushed). Plan: `docs/superpowers/plans/2026-11-24-p3-fixes-p4-site-user.md` (executed inline, final whole-branch review on Opus).
+- Commits: `bed2e10`, `5b5b108`, `c68a32a`, `4272f41`, `133f1a8` (initial P4 by OpenCode) → `2013edd` (repair plan) → `5eabecd` (DB: P3 review guards + `remove_attachment` RPC) → `6e80db9` (401 → session failure, server-side `archived_at`) → `d79989d` (certificate data layer via RPCs, local dates, valid storage paths) → `4b52316` (draft auto-save, safe create-or-update) → `f7d1863` (entry page: storage path, mime, auto-save, localized status, confirmations) → final-review fixes `fe8d5c7` (signed copies never removable, migration `20261124150000_remove_attachment_initial_only`; finalize retry reuses this round's signed copy), `b7a5fa6` (submit queued behind saves, auto-save cancelled; records over all sites, kept current), `2af6806` (records open in the entry tab, pull-to-refresh, new-certificate action) → docs commit.
+- Delivered: site-user shell (bottom nav: dashboard / entry / records); certificate entry with site picker, amount validation, debounced auto-save, upload (mime allow-list, size limit, SHA-256 duplicate check, progress), signed-copy upload + finalize (a retry reuses this round's signed copy), confirm-before-delete; records list over all assigned sites (tap to open, pull to refresh, new-certificate action); Arabic status/period labels; read-only view after submission; soft-remove of attachments on draft/returned certificates (Q21, pending owner confirmation); signed copies can never be removed. New open questions: Q22 (initial file required before submit?), Q23 (block entry on archived sites?).
+- Verification:
+  - `flutter analyze` -> No issues found!
+  - `flutter test` -> 275 passed, 0 failed
+  - `bash supabase/tests/run_remote.sh` -> Files=12, Result: PASS (11_p3_fixes_p4 added, 29 assertions)
+  - deno tests: admin-create-user 31, finalize-certificate 17, _shared 2 (50 total, 0 failed). Correction: the P3 total above should read 50, not 44.
+  - `flutter build web --release` -> `√ Built build\web`
+  - APK build not re-run in this phase.
+
+## P5-P7: Pending
 - Status: Not started.

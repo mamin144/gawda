@@ -394,3 +394,18 @@ SKILLS APPLIED:
 - `verification-before-completion`: every claim backed by a command — `flutter analyze` (No issues found!), `flutter test` (215 passed), deno (admin-create-user 31, finalize-certificate 17, _shared 2), `run_remote.sh` (Files=11, PASS), `flutter build web --release` (exit 0), `flutter build apk --debug` (exit 0), MCP `get_advisors` (1 security WARN accepted, 7 performance INFO accepted), `node verify_p0.mjs` (exit 0).
 - `supabase`: `admin-create-user` redeployed (version 2, ACTIVE, verify_jwt true) via `--yes`; advisors unchanged from P1.
 - `systematic-debugging`: applied parked minors — dropped `user_exists` from `businessRuleCodes`; `updateProfile` now uses `.select('id').single()` so zero-row updates surface as PGRST116; removed stray shell-command text from this file.
+
+### P4: P3 fix wave + site-user certificate flow (24 November 2026)
+
+SKILLS LOADED: `using-superpowers`, `brainstorming`, `audit-context-building`, `writing-plans`, `executing-plans`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `supabase`, `supabase-postgres-best-practices`, `flutter-apply-architecture-best-practices`, `flutter-build-responsive-layout`, `flutter-add-widget-test`, `flutter-implement-json-serialization`, `dart-use-pattern-matching`, `dart-run-static-analysis`, `ui-ux-pro-max`.
+SKILLS APPLIED:
+- `audit-context-building`: mapped the P3/P4 data flow (RPC guards, storage path rules, cubit state) before the plan; unenforced assumptions became plan tasks.
+- `writing-plans` / `executing-plans`: one plan, six tasks, ledger with rulings, one fresh whole-branch review at the end.
+- `test-driven-development`: every fix started with a failing test (pgTAP `11_p3_fixes_p4`, cubit and page tests), RED then GREEN.
+- `supabase-postgres-best-practices`: `remove_attachment` as SECURITY DEFINER RPC with fixed `search_path`, status guard and soft delete; RLS unchanged.
+- `systematic-debugging`: reload loop traced to post-frame reloads in dashboard/records; fixed at the source (shell loads once).
+- `dart-use-pattern-matching`: switch expressions for state rendering and status/kind/period labels.
+- `flutter-add-widget-test`: `ensureVisible` before tapping below-the-fold buttons.
+- `ui-ux-pro-max`: confirm dialogs for destructive actions (red delete button), "saved" snackbar, upload progress indicator, inline field validation through a `Form` key, bottom nav limited to 3 items (quick-reference fallback; database search returned off-topic results), status shown as text not color alone.
+- `verification-before-completion`: analyze / test / pgTAP / deno / web build run fresh before the report.
+- Final-review fix pass (same phase): `executing-plans` (re-graded findings; C1 and I1–I4 fixed in one pass, M1–M7 deferred, declined-to-judge items ruled), `test-driven-development` (each fix RED→GREEN; mutation checks on the round rule, form reset and pull-to-refresh), `supabase-postgres-best-practices` (`remove_attachment` narrowed to `kind = 'initial'` in a new migration, pushed with `db push --remote`), `verification-before-completion` (two rulings found false on re-check, `submit` has no attachment guard and archived sites are not blocked, so both were rewritten and raised as Q22/Q23 instead of guessed), `ui-ux-pro-max` (pull-to-refresh, tap-to-open rows, a labelled "new certificate" icon button with tooltip).
