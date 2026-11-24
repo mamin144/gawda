@@ -279,7 +279,20 @@ class _EntryBodyState extends State<_EntryBody> {
     final session = context.read<SessionCubit>().state;
     final actorId = session is SessionAuthenticated ? session.user.id : null;
     if (actorId == null) return;
-    if (!await _upload(AttachmentKind.signed, _pickFile)) return;
+    // A retry after a failed finalize reuses the signed copy of this round
+    // instead of uploading it again (which the duplicate check would reject).
+    // The round starts at approve_for_signing, the last change of the row
+    // while it awaits signature; earlier rounds' copies do not count (the
+    // server applies the same rule).
+    final state = _cubit.state;
+    final atts = state is CertificateLoaded ? state.attachments : const <Attachment>[];
+    final hasSigned = atts.any(
+      (a) =>
+          a.kind == AttachmentKind.signed &&
+          a.deletedAt == null &&
+          !a.uploadedAt.isBefore(cert.updatedAt),
+    );
+    if (!hasSigned && !await _upload(AttachmentKind.signed, _pickFile)) return;
     await _cubit.finalize(certificateId: cert.id, actorId: actorId);
   }
 
@@ -393,7 +406,8 @@ class _EntryBodyState extends State<_EntryBody> {
                 ),
                 title: Text(a.fileName),
                 subtitle: Text(attachmentKindLabel(a.kind, l10n)),
-                trailing: editable
+                // Signed copies are never removable (PROJECT_PLAN 5).
+                trailing: editable && a.kind == AttachmentKind.initial
                     ? IconButton(
                         tooltip: l10n.attachmentRemove,
                         icon: const Icon(Icons.delete_outline),

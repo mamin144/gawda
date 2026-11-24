@@ -2,7 +2,7 @@ begin;
 \set tests_in_transaction true
 \ir _helpers.sql
 
-select plan(27);
+select plan(29);
 
 -- Local helpers (rolled back with the test).
 create schema t11;
@@ -33,7 +33,7 @@ select set_config('t11.su2', tests.create_user('t11-su2@example.test', 'site_use
 select set_config('t11.supro', tests.create_user('t11-supro@example.test', 'site_user')::text, true);
 select set_config('t11.' || n, gen_random_uuid()::text, true)
 from unnest(array['site1', 'site2', 'sarch', 'delsite', 'c_draft', 'c_sub', 'c_del',
-                  'a_draft', 'a_sub', 'random']) as n;
+                  'a_draft', 'a_sub', 'a_signed', 'a_admin', 'random']) as n;
 
 insert into public.sites (id, code, name) values
   (t11.id('site1'), 't11-site-1', 'T11 Site 1'),
@@ -51,7 +51,11 @@ insert into public.attachments (id, certificate_id, kind, storage_path, file_nam
   (t11.id('a_draft'), t11.id('c_draft'), 'initial',
    t11.id('site1') || '/2026/4/1/a.pdf', 'a.pdf', 'application/pdf', 10, repeat('a', 64), t11.id('su')),
   (t11.id('a_sub'), t11.id('c_sub'), 'initial',
-   t11.id('site1') || '/2026/4/2/b.pdf', 'b.pdf', 'application/pdf', 10, repeat('b', 64), t11.id('su'));
+   t11.id('site1') || '/2026/4/2/b.pdf', 'b.pdf', 'application/pdf', 10, repeat('b', 64), t11.id('su')),
+  (t11.id('a_signed'), t11.id('c_draft'), 'signed',
+   t11.id('site1') || '/2026/4/1/s.pdf', 's.pdf', 'application/pdf', 10, repeat('c', 64), t11.id('su')),
+  (t11.id('a_admin'), t11.id('c_draft'), 'initial',
+   t11.id('site1') || '/2026/4/1/d.pdf', 'd.pdf', 'application/pdf', 10, repeat('d', 64), t11.id('su'));
 update auth.users set email_confirmed_at = now() where id = t11.id('su2');
 
 -- 1-2: user_sites only links site users (P3 review).
@@ -133,7 +137,7 @@ select throws_ok(
 );
 select tests.reset_role();
 
--- 17-25: remove_attachment (R1).
+-- 17-27: remove_attachment (R1).
 select tests.act_as(t11.id('su2'));
 select throws_ok(
   format('select public.remove_attachment(%L)', t11.id('a_draft')),
@@ -170,6 +174,20 @@ select lives_ok(
          t11.id('c_draft'), t11.id('site1') || '/2026/4/1/a2.pdf', repeat('a', 64), t11.id('su')),
   'the same file can be attached again after removal'
 );
+-- 25-26: signed copies are never removable (PROJECT_PLAN 5); an admin
+-- follows the same rules (R1, I5).
+select tests.act_as(t11.id('su'));
+select throws_ok(
+  format('select public.remove_attachment(%L)', t11.id('a_signed')),
+  'P0001', 'invalid_transition', 'a signed copy cannot be removed, even on a draft'
+);
+select tests.reset_role();
+select tests.act_as(t11.id('admin'));
+select lives_ok(
+  format('select public.remove_attachment(%L)', t11.id('a_admin')),
+  'an admin removes an initial attachment of a draft certificate'
+);
+select tests.reset_role();
 -- anon has no usage on schema tests, so return with a plain reset role.
 set local role anon;
 select throws_ok(
@@ -178,7 +196,7 @@ select throws_ok(
 );
 reset role;
 
--- 26-27: structure and privileges of remove_attachment.
+-- 28-29: structure and privileges of remove_attachment.
 select ok(
   (select bool_and(proconfig = array['search_path=""']
                    and prosecdef = (pronamespace = 'private'::regnamespace))
