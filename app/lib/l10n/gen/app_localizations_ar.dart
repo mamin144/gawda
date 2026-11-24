@@ -323,4 +323,71 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certificateRecords => 'سجل الشهادات';
+
+  @override
+  String get statusDraft => 'مسودة';
+
+  @override
+  String get statusInReview => 'قيد المراجعة';
+
+  @override
+  String get statusReturned => 'مُعادة للتعديل';
+
+  @override
+  String get statusAwaitingSignature => 'بانتظار التوقيع';
+
+  @override
+  String get statusApproved => 'معتمدة';
+
+  @override
+  String periodLabel(int year, String month, int half) {
+    return '$year-$month (النصف $half)';
+  }
+
+  @override
+  String get attachmentPickCamera => 'الكاميرا';
+
+  @override
+  String get attachmentPickGallery => 'المعرض';
+
+  @override
+  String get attachmentKindInitial => 'مرفق أولي';
+
+  @override
+  String get attachmentKindSigned => 'نسخة موقّعة';
+
+  @override
+  String get attachmentTypeNotAllowed => 'نوع الملف غير مسموح. المسموح: PDF أو JPG أو PNG';
+
+  @override
+  String get attachmentUploading => 'جارٍ رفع الملف...';
+
+  @override
+  String get attachmentRemove => 'حذف المرفق';
+
+  @override
+  String get attachmentRemoveConfirmTitle => 'حذف المرفق؟';
+
+  @override
+  String attachmentRemoveConfirmBody(String name) {
+    return 'سيتم حذف «$name» من هذه الشهادة.';
+  }
+
+  @override
+  String get certificateDelete => 'حذف الشهادة';
+
+  @override
+  String get certificateDeleteConfirmTitle => 'حذف الشهادة؟';
+
+  @override
+  String get certificateDeleteConfirmBody => 'سيتم حذف هذه المسودة ومرفقاتها.';
+
+  @override
+  String get certificateDraftSaved => 'تم حفظ المسودة';
+
+  @override
+  String get certificateAmountInvalid => 'أدخل مبلغًا صحيحًا بحد أقصى منزلتين عشريتين';
+
+  @override
+  String get deleteButton => 'حذف';
 }

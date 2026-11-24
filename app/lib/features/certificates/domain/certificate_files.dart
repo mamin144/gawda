@@ -44,3 +44,23 @@ String buildStoragePath({
   return '$siteId/${certificateDate.year}/${certificateDate.month}/'
       '${periodHalfOf(certificateDate)}/$name';
 }
+
+final _amountPattern = RegExp(r'^\d+(\.\d{1,2})?$');
+
+/// Canonical amount text for the database `numeric(18,2) >= 0` column, or
+/// null when [input] is not a non-negative number with at most two decimals.
+/// Arabic-Indic digits and the Arabic decimal separator are accepted.
+String? normalizeAmount(String input) {
+  final buffer = StringBuffer();
+  for (final rune in input.trim().runes) {
+    if (rune >= 0x0660 && rune <= 0x0669) {
+      buffer.writeCharCode(0x30 + rune - 0x0660);
+    } else if (rune == 0x066B) {
+      buffer.write('.');
+    } else {
+      buffer.writeCharCode(rune);
+    }
+  }
+  final text = buffer.toString();
+  return _amountPattern.hasMatch(text) ? text : null;
+}

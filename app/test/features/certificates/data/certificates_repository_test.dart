@@ -62,7 +62,9 @@ void main() {
     );
 
     expect(result.isRight(), isTrue);
-    final sent = verify(() => service.insertCertificate(captureAny())).captured.single as Map<String, dynamic>;
+    final sent =
+        verify(() => service.insertCertificate(captureAny())).captured.single
+            as Map<String, dynamic>;
     expect(sent.containsKey('status'), isFalse);
     expect(sent['certificate_date'], '2026-03-01');
     expect(sent['site_id'], 's1');
@@ -73,7 +75,9 @@ void main() {
 
     await repo.updateDraft('c1', certificateDate: DateTime(2026, 3, 1));
 
-    final sent = verify(() => service.updateCertificate('c1', captureAny())).captured.single as Map<String, dynamic>;
+    final sent =
+        verify(() => service.updateCertificate('c1', captureAny())).captured.single
+            as Map<String, dynamic>;
     expect(sent, {'certificate_date': '2026-03-01'});
   });
 

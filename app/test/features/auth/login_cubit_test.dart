@@ -12,7 +12,12 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 void main() {
   late MockAuthRepository repo;
 
-  const user = AppUser(id: 'u1', fullName: 'مستخدم تجريبي (seed)', role: UserRole.siteUser, isActive: true);
+  const user = AppUser(
+    id: 'u1',
+    fullName: 'مستخدم تجريبي (seed)',
+    role: UserRole.siteUser,
+    isActive: true,
+  );
 
   setUp(() {
     repo = MockAuthRepository();
@@ -29,7 +34,10 @@ void main() {
       ),
     ],
     verify: (_) => verifyNever(
-      () => repo.signIn(email: any(named: 'email'), password: any(named: 'password')),
+      () => repo.signIn(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
     ),
   );
 
@@ -51,7 +59,10 @@ void main() {
       ),
     ],
     verify: (_) => verifyNever(
-      () => repo.signIn(email: any(named: 'email'), password: any(named: 'password')),
+      () => repo.signIn(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
     ),
   );
 
@@ -69,8 +80,16 @@ void main() {
     expect: () => [
       const LoginState(email: '  site1@example.test  '),
       const LoginState(email: '  site1@example.test  ', password: 'secret'),
-      const LoginState(email: 'site1@example.test', password: 'secret', status: LoginStatus.submitting),
-      const LoginState(email: 'site1@example.test', password: 'secret', status: LoginStatus.success),
+      const LoginState(
+        email: 'site1@example.test',
+        password: 'secret',
+        status: LoginStatus.submitting,
+      ),
+      const LoginState(
+        email: 'site1@example.test',
+        password: 'secret',
+        status: LoginStatus.success,
+      ),
     ],
   );
 
@@ -88,7 +107,11 @@ void main() {
     expect: () => [
       const LoginState(email: 'site1@example.test'),
       const LoginState(email: 'site1@example.test', password: 'secret'),
-      const LoginState(email: 'site1@example.test', password: 'secret', status: LoginStatus.submitting),
+      const LoginState(
+        email: 'site1@example.test',
+        password: 'secret',
+        status: LoginStatus.submitting,
+      ),
       const LoginState(
         email: 'site1@example.test',
         password: 'secret',

@@ -15,7 +15,12 @@ void main() {
   late MockAuthRepository repo;
   late StreamController<AuthEvent> events;
 
-  const user = AppUser(id: 'u1', fullName: 'مستخدم تجريبي (seed)', role: UserRole.siteUser, isActive: true);
+  const user = AppUser(
+    id: 'u1',
+    fullName: 'مستخدم تجريبي (seed)',
+    role: UserRole.siteUser,
+    isActive: true,
+  );
 
   setUp(() {
     repo = MockAuthRepository();

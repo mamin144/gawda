@@ -42,7 +42,10 @@ void main() {
   group('signIn', () {
     test('returns the domain user on success', () async {
       when(
-        () => auth.signInWithPassword(email: any(named: 'email'), password: any(named: 'password')),
+        () => auth.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
       ).thenAnswer((_) async {});
       stubSignedInFetch(activeRow);
 
@@ -57,7 +60,10 @@ void main() {
 
     test('maps invalid credentials to InvalidCredentialsFailure', () async {
       when(
-        () => auth.signInWithPassword(email: any(named: 'email'), password: any(named: 'password')),
+        () => auth.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
       ).thenThrow(const AuthException('Invalid login credentials', code: 'invalid_credentials'));
 
       final result = await repo.signIn(email: 'site1@example.test', password: 'wrong');
@@ -68,7 +74,10 @@ void main() {
 
     test('signs out and returns AccountInactiveFailure for a deactivated account', () async {
       when(
-        () => auth.signInWithPassword(email: any(named: 'email'), password: any(named: 'password')),
+        () => auth.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
       ).thenAnswer((_) async {});
       stubSignedInFetch(Map<String, dynamic>.from(activeRow)..['is_active'] = false);
 
@@ -80,7 +89,10 @@ void main() {
 
     test('maps network errors to NetworkFailure', () async {
       when(
-        () => auth.signInWithPassword(email: any(named: 'email'), password: any(named: 'password')),
+        () => auth.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
       ).thenThrow(const SocketException('offline'));
 
       final result = await repo.signIn(email: 'site1@example.test', password: 'x');

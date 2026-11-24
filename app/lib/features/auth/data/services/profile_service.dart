@@ -12,9 +12,6 @@ class SupabaseProfileService implements ProfileService {
   final SupabaseClient _client;
 
   @override
-  Future<Map<String, dynamic>> fetchProfile(String userId) => _client
-      .from('profiles')
-      .select('id, full_name, role, is_active')
-      .eq('id', userId)
-      .single();
+  Future<Map<String, dynamic>> fetchProfile(String userId) =>
+      _client.from('profiles').select('id, full_name, role, is_active').eq('id', userId).single();
 }

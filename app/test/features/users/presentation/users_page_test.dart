@@ -200,7 +200,8 @@ void main() {
     tester,
   ) async {
     when(
-      () => usersRepo.update('u2', fullName: 'سامي الجديد', role: UserRole.siteUser, isActive: true),
+      () =>
+          usersRepo.update('u2', fullName: 'سامي الجديد', role: UserRole.siteUser, isActive: true),
     ).thenAnswer((_) async => const Right(null));
     when(
       () => usersRepo.setSites('u2', const ['s1', 's3']),

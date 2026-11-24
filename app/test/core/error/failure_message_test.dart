@@ -21,8 +21,14 @@ void main() {
 
   test('maps the P4 business rule codes to specific messages', () {
     expect(failureMessage(const BusinessRuleFailure('has_sites'), l10n), l10n.errorHasSites);
-    expect(failureMessage(const BusinessRuleFailure('already_deleted'), l10n), l10n.errorAlreadyDeleted);
-    expect(failureMessage(const BusinessRuleFailure('invalid_transition'), l10n), l10n.errorInvalidTransition);
+    expect(
+      failureMessage(const BusinessRuleFailure('already_deleted'), l10n),
+      l10n.errorAlreadyDeleted,
+    );
+    expect(
+      failureMessage(const BusinessRuleFailure('invalid_transition'), l10n),
+      l10n.errorInvalidTransition,
+    );
     expect(failureMessage(const BusinessRuleFailure('not_found'), l10n), l10n.errorNotFound);
   });
 

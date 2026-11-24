@@ -126,5 +126,36 @@
   "siteTabAccount": "حسابي",
   "certificatePeriod": "فترة الشهادة",
   "noCertificates": "لا توجد شهادات بعد",
-  "certificateRecords": "سجل الشهادات"
+  "certificateRecords": "سجل الشهادات",
+  "statusDraft": "مسودة",
+  "statusInReview": "قيد المراجعة",
+  "statusReturned": "مُعادة للتعديل",
+  "statusAwaitingSignature": "بانتظار التوقيع",
+  "statusApproved": "معتمدة",
+  "periodLabel": "{year}-{month} (النصف {half})",
+  "@periodLabel": {
+    "placeholders": {
+      "year": {"type": "int"},
+      "month": {"type": "String"},
+      "half": {"type": "int"}
+    }
+  },
+  "attachmentPickCamera": "الكاميرا",
+  "attachmentPickGallery": "المعرض",
+  "attachmentKindInitial": "مرفق أولي",
+  "attachmentKindSigned": "نسخة موقّعة",
+  "attachmentTypeNotAllowed": "نوع الملف غير مسموح. المسموح: PDF أو JPG أو PNG",
+  "attachmentUploading": "جارٍ رفع الملف...",
+  "attachmentRemove": "حذف المرفق",
+  "attachmentRemoveConfirmTitle": "حذف المرفق؟",
+  "attachmentRemoveConfirmBody": "سيتم حذف «{name}» من هذه الشهادة.",
+  "@attachmentRemoveConfirmBody": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "certificateDelete": "حذف الشهادة",
+  "certificateDeleteConfirmTitle": "حذف الشهادة؟",
+  "certificateDeleteConfirmBody": "سيتم حذف هذه المسودة ومرفقاتها.",
+  "certificateDraftSaved": "تم حفظ المسودة",
+  "certificateAmountInvalid": "أدخل مبلغًا صحيحًا بحد أقصى منزلتين عشريتين",
+  "deleteButton": "حذف"
 }

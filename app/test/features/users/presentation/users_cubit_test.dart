@@ -79,7 +79,8 @@ void main() {
 
     blocTest<UsersCubit, UsersState>(
       'emits Error when the users repository fails',
-      setUp: () => when(() => usersRepo.list()).thenAnswer((_) async => const Left(NetworkFailure())),
+      setUp: () =>
+          when(() => usersRepo.list()).thenAnswer((_) async => const Left(NetworkFailure())),
       build: () => UsersCubit(usersRepo, sitesRepo),
       act: (cubit) => cubit.load(),
       expect: () => [const UsersLoading(), const UsersError(NetworkFailure())],
@@ -106,9 +107,11 @@ void main() {
         [siteUser],
       );
       expect(
-        const UsersLoaded(users: users, activeSites: activeSites, query: 'example.test')
-            .visibleUsers
-            .length,
+        const UsersLoaded(
+          users: users,
+          activeSites: activeSites,
+          query: 'example.test',
+        ).visibleUsers.length,
         3,
       );
     });
@@ -198,13 +201,23 @@ void main() {
     blocTest<UsersCubit, UsersState>(
       'update success returns true and reloads',
       setUp: () => when(
-        () => usersRepo.update('u2', fullName: 'سامي الجديد', role: UserRole.siteUser, isActive: false),
+        () => usersRepo.update(
+          'u2',
+          fullName: 'سامي الجديد',
+          role: UserRole.siteUser,
+          isActive: false,
+        ),
       ).thenAnswer((_) async => const Right(null)),
       build: () => UsersCubit(usersRepo, sitesRepo),
       act: (cubit) async {
         await cubit.load();
         expect(
-          await cubit.update('u2', fullName: 'سامي الجديد', role: UserRole.siteUser, isActive: false),
+          await cubit.update(
+            'u2',
+            fullName: 'سامي الجديد',
+            role: UserRole.siteUser,
+            isActive: false,
+          ),
           isTrue,
         );
       },
@@ -224,7 +237,8 @@ void main() {
     blocTest<UsersCubit, UsersState>(
       'setSites success returns true and reloads',
       setUp: () =>
-          when(() => usersRepo.setSites('u2', const ['s3'])).thenAnswer((_) async => const Right(null)),
+          when(() => usersRepo.setSites('u2', const ['s3']))
+              .thenAnswer((_) async => const Right(null)),
       build: () => UsersCubit(usersRepo, sitesRepo),
       act: (cubit) async {
         await cubit.load();

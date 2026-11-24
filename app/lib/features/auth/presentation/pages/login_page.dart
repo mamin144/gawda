@@ -33,9 +33,17 @@ class LoginPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(l10n.appTitle, style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
+                      Text(
+                        l10n.appTitle,
+                        style: theme.textTheme.titleMedium,
+                        textAlign: TextAlign.center,
+                      ),
                       SizedBox(height: spacing.xxl),
-                      Text(l10n.loginTitle, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+                      Text(
+                        l10n.loginTitle,
+                        style: theme.textTheme.headlineSmall,
+                        textAlign: TextAlign.center,
+                      ),
                       SizedBox(height: spacing.xl),
                       TextField(
                         onChanged: cubit.emailChanged,

@@ -42,13 +42,19 @@ void main() {
     await tester.pump();
     expect(find.text('هذا الحقل مطلوب'), findsNWidgets(2));
     verifyNever(
-      () => repo.signIn(email: any(named: 'email'), password: any(named: 'password')),
+      () => repo.signIn(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
     );
   });
 
   testWidgets('invalid credentials show the Arabic error banner', (tester) async {
     when(
-      () => repo.signIn(email: any(named: 'email'), password: any(named: 'password')),
+      () => repo.signIn(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
     ).thenAnswer((_) async => const Left(InvalidCredentialsFailure()));
 
     await tester.pumpWidget(buildPage());
@@ -64,7 +70,10 @@ void main() {
   testWidgets('submitting disables the button and shows a spinner', (tester) async {
     final completer = Completer<Result<AppUser>>();
     when(
-      () => repo.signIn(email: any(named: 'email'), password: any(named: 'password')),
+      () => repo.signIn(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
     ).thenAnswer((_) => completer.future);
 
     await tester.pumpWidget(buildPage());

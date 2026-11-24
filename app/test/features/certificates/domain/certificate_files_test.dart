@@ -46,4 +46,21 @@ void main() {
   });
 
   test('maxAttachmentBytes is 2 MiB', () => expect(maxAttachmentBytes, 2097152));
+
+  group('normalizeAmount', () {
+    test('accepts plain and 2-decimal amounts', () {
+      expect(normalizeAmount('1500'), '1500');
+      expect(normalizeAmount(' 12.5 '), '12.5');
+      expect(normalizeAmount('0.75'), '0.75');
+      expect(normalizeAmount('0'), '0');
+    });
+    test('converts Arabic-Indic digits and the Arabic decimal separator', () {
+      expect(normalizeAmount('١٢٣٫٤٥'), '123.45');
+    });
+    test('rejects empty, negative, 3 decimals, letters and separators', () {
+      for (final bad in ['', '  ', '-5', '1.234', 'abc', '1,000', '.5', '5.']) {
+        expect(normalizeAmount(bad), isNull, reason: bad);
+      }
+    });
+  });
 }

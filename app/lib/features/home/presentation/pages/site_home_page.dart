@@ -28,7 +28,12 @@ class SiteHomePage extends StatelessWidget {
       ),
       body: user == null
           ? const LoadingView()
-          : Center(child: Text(l10n.welcomeUser(user.fullName), style: Theme.of(context).textTheme.titleLarge)),
+          : Center(
+              child: Text(
+                l10n.welcomeUser(user.fullName),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
     );
   }
 }

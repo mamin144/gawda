@@ -30,8 +30,7 @@ class LoginCubit extends Cubit<LoginState> {
 
   void emailChanged(String value) => emit(state.copyWith(email: value, emailError: null));
 
-  void passwordChanged(String value) =>
-      emit(state.copyWith(password: value, passwordError: null));
+  void passwordChanged(String value) => emit(state.copyWith(password: value, passwordError: null));
 
   Future<void> submitted() async {
     final email = state.email.trim();

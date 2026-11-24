@@ -15,7 +15,13 @@ import 'l10n/gen/app_localizations.dart';
 /// Root widget: owns the session cubit and router lifecycles and wires
 /// theme, Arabic RTL localization and role-based routing together.
 class App extends StatefulWidget {
-  const App({super.key, required this.repo, required this.sitesRepo, required this.usersRepo, required this.certsRepo});
+  const App({
+    super.key,
+    required this.repo,
+    required this.sitesRepo,
+    required this.usersRepo,
+    required this.certsRepo,
+  });
 
   final AuthRepository repo;
   final SitesRepository sitesRepo;

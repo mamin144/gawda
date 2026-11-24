@@ -28,7 +28,8 @@ void main() {
   final usersRepo = MockUsersRepository();
   final certsRepo = MockCertificatesRepository();
 
-  App buildApp() => App(repo: repo, sitesRepo: sitesRepo, usersRepo: usersRepo, certsRepo: certsRepo);
+  App buildApp() =>
+      App(repo: repo, sitesRepo: sitesRepo, usersRepo: usersRepo, certsRepo: certsRepo);
 
   const admin = AppUser(id: 'a', fullName: 'مدير (seed)', role: UserRole.admin, isActive: true);
 

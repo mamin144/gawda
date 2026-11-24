@@ -49,14 +49,13 @@ final class CertificateLoaded extends CertificateState {
     List<Certificate>? records,
     AppFailure? actionError,
     bool clearActionError = false,
-  }) =>
-      CertificateLoaded(
-        sites: sites ?? this.sites,
-        certificate: clearCertificate ? null : (certificate ?? this.certificate),
-        attachments: attachments ?? this.attachments,
-        records: records ?? this.records,
-        actionError: clearActionError ? null : (actionError ?? this.actionError),
-      );
+  }) => CertificateLoaded(
+    sites: sites ?? this.sites,
+    certificate: clearCertificate ? null : (certificate ?? this.certificate),
+    attachments: attachments ?? this.attachments,
+    records: records ?? this.records,
+    actionError: clearActionError ? null : (actionError ?? this.actionError),
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -68,7 +67,13 @@ final class CertificateLoaded extends CertificateState {
       other.actionError == actionError;
 
   @override
-  int get hashCode => Object.hash(Object.hashAll(sites), certificate, Object.hashAll(attachments), Object.hashAll(records), actionError);
+  int get hashCode => Object.hash(
+    Object.hashAll(sites),
+    certificate,
+    Object.hashAll(attachments),
+    Object.hashAll(records),
+    actionError,
+  );
 }
 
 final class CertificateError extends CertificateState {
@@ -213,17 +218,32 @@ class CertificateCubit extends Cubit<CertificateState> {
     emit(CertificateLoaded(sites: sites));
   }
 
+  /// Loads the sites, then the records of the first site (once).
+  Future<void> loadSitesAndRecords() async {
+    await loadSites();
+    if (state case CertificateLoaded(:final sites) when sites.isNotEmpty) {
+      await loadRecords(sites.first.id);
+    }
+  }
+
+  /// Reloads [siteId]'s records, keeping any open certificate.
   Future<void> loadRecords(String siteId) async {
-    final current = state;
-    final sites = current is CertificateLoaded ? current.sites : <Site>[];
     final result = await _certsRepo.listForSite(siteId);
     if (isClosed) return;
     if (result case Left(value: final failure)) {
-      emit(CertificateError(failure));
+      if (state is CertificateLoaded) {
+        _setError(failure);
+      } else {
+        emit(CertificateError(failure));
+      }
       return;
     }
     final records = result.getOrElse((_) => const <Certificate>[]);
-    emit(CertificateLoaded(sites: sites, records: records));
+    if (state case final CertificateLoaded loaded) {
+      emit(loaded.copyWith(records: records));
+    } else {
+      emit(CertificateLoaded(sites: const [], records: records));
+    }
   }
 
   Future<void> openCertificate(String certificateId) async {
@@ -263,7 +283,12 @@ class CertificateCubit extends Cubit<CertificateState> {
     String? amount,
     String? notes,
   }) async {
-    final result = await _certsRepo.updateDraft(id, certificateDate: certificateDate, amount: amount, notes: notes);
+    final result = await _certsRepo.updateDraft(
+      id,
+      certificateDate: certificateDate,
+      amount: amount,
+      notes: notes,
+    );
     return _applyResult(result);
   }
 

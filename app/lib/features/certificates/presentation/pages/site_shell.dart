@@ -21,7 +21,7 @@ class SiteShell extends StatelessWidget {
       create: (context) => CertificateCubit(
         context.read<CertificatesRepository>(),
         context.read<SitesRepository>(),
-      )..loadSites(),
+      )..loadSitesAndRecords(),
       child: const _ShellView(),
     );
   }
@@ -45,7 +45,7 @@ class _ShellViewState extends State<_ShellView> {
         index: _index,
         children: const [
           SiteDashboardPage(),
-          CertificateEntryBody(),
+          _EntryTab(),
           SiteRecordsPage(),
           _AccountTab(),
         ],
@@ -54,7 +54,10 @@ class _ShellViewState extends State<_ShellView> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
-          NavigationDestination(icon: const Icon(Icons.dashboard_outlined), label: l10n.siteTabDashboard),
+          NavigationDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            label: l10n.siteTabDashboard,
+          ),
           NavigationDestination(icon: const Icon(Icons.edit_note), label: l10n.siteTabEntry),
           NavigationDestination(icon: const Icon(Icons.list_alt), label: l10n.siteTabRecords),
           NavigationDestination(icon: const Icon(Icons.person_outline), label: l10n.siteTabAccount),
@@ -62,6 +65,16 @@ class _ShellViewState extends State<_ShellView> {
       ),
     );
   }
+}
+
+class _EntryTab extends StatelessWidget {
+  const _EntryTab();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(AppLocalizations.of(context).siteTabEntry)),
+    body: const CertificateEntryBody(),
+  );
 }
 
 class _AccountTab extends StatelessWidget {

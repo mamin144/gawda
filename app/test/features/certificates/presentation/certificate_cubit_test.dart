@@ -17,19 +17,20 @@ class MockCertificatesRepository extends Mock implements CertificatesRepository 
 
 class MockSitesRepository extends Mock implements SitesRepository {}
 
-Certificate _cert({String id = 'c1', CertificateStatus status = CertificateStatus.draft}) => Certificate(
-  id: id,
-  siteId: 's1',
-  certificateDate: DateTime(2026, 3, 1),
-  periodYear: 2026,
-  periodMonth: 3,
-  periodHalf: 1,
-  amount: '10',
-  status: status,
-  createdBy: 'u1',
-  createdAt: DateTime.utc(2026, 3, 1),
-  updatedAt: DateTime.utc(2026, 3, 1),
-);
+Certificate _cert({String id = 'c1', CertificateStatus status = CertificateStatus.draft}) =>
+    Certificate(
+      id: id,
+      siteId: 's1',
+      certificateDate: DateTime(2026, 3, 1),
+      periodYear: 2026,
+      periodMonth: 3,
+      periodHalf: 1,
+      amount: '10',
+      status: status,
+      createdBy: 'u1',
+      createdAt: DateTime.utc(2026, 3, 1),
+      updatedAt: DateTime.utc(2026, 3, 1),
+    );
 
 final _att = Attachment(
   id: 'a1',
@@ -101,10 +102,16 @@ void main() {
     expect(await save('20'), isTrue);
 
     verify(
-      () => certs.createDraft(siteId: 's1', certificateDate: DateTime(2026, 3, 1), amount: '10', notes: null),
+      () => certs.createDraft(
+        siteId: 's1',
+        certificateDate: DateTime(2026, 3, 1),
+        amount: '10',
+        notes: null,
+      ),
     ).called(1);
     verify(
-      () => certs.updateDraft('c1', certificateDate: DateTime(2026, 3, 1), amount: '20', notes: null),
+      () =>
+          certs.updateDraft('c1', certificateDate: DateTime(2026, 3, 1), amount: '20', notes: null),
     ).called(1);
     expect((cubit.state as CertificateLoaded).certificate, _cert());
   });
@@ -180,7 +187,12 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 80));
 
     verify(
-      () => certs.createDraft(siteId: 's1', certificateDate: DateTime(2026, 3, 1), amount: '123', notes: null),
+      () => certs.createDraft(
+        siteId: 's1',
+        certificateDate: DateTime(2026, 3, 1),
+        amount: '123',
+        notes: null,
+      ),
     ).called(1);
   });
 
@@ -246,5 +258,38 @@ void main() {
     final s = cubit.state as CertificateLoaded;
     expect(s.actionError, const ForbiddenFailure());
     expect(s.certificate, _cert());
+  });
+
+  test('loadSitesAndRecords loads the first site records once', () async {
+    when(() => certs.listForSite(any())).thenAnswer((_) async => Right([_cert()]));
+
+    await cubit.loadSitesAndRecords();
+
+    verify(() => certs.listForSite('s1')).called(1);
+    final s = cubit.state as CertificateLoaded;
+    expect(s.sites, [_site]);
+    expect(s.records, [_cert()]);
+  });
+
+  test('loadSitesAndRecords with no sites does not query records', () async {
+    when(() => sites.list()).thenAnswer((_) async => const Right(<Site>[]));
+
+    await cubit.loadSitesAndRecords();
+
+    verifyNever(() => certs.listForSite(any()));
+    expect(cubit.state, const CertificateLoaded(sites: []));
+  });
+
+  test('loadRecords keeps the open certificate', () async {
+    await cubit.loadSites();
+    stubCreate();
+    await save();
+    when(() => certs.listForSite(any())).thenAnswer((_) async => Right([_cert(id: 'c2')]));
+
+    await cubit.loadRecords('s1');
+
+    final s = cubit.state as CertificateLoaded;
+    expect(s.certificate, _cert());
+    expect(s.records, [_cert(id: 'c2')]);
   });
 }

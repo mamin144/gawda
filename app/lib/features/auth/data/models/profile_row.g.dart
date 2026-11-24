@@ -13,10 +13,9 @@ _ProfileRow _$ProfileRowFromJson(Map<String, dynamic> json) => _ProfileRow(
   isActive: json['is_active'] as bool,
 );
 
-Map<String, dynamic> _$ProfileRowToJson(_ProfileRow instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'full_name': instance.fullName,
-      'role': instance.role,
-      'is_active': instance.isActive,
-    };
+Map<String, dynamic> _$ProfileRowToJson(_ProfileRow instance) => <String, dynamic>{
+  'id': instance.id,
+  'full_name': instance.fullName,
+  'role': instance.role,
+  'is_active': instance.isActive,
+};

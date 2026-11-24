@@ -112,7 +112,9 @@ void main() {
     expect(calls, isEmpty);
   });
 
-  testWidgets('user_exists shows the email taken message and keeps the dialog open', (tester) async {
+  testWidgets('user_exists shows the email taken message and keeps the dialog open', (
+    tester,
+  ) async {
     final popped = <Object?>[];
     await openDialog(tester, failure: const BusinessRuleFailure('user_exists'), popped: popped);
     await fillValid(tester);

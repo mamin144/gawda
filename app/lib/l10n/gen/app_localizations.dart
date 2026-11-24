@@ -685,6 +685,132 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'سجل الشهادات'**
   String get certificateRecords;
+
+  /// No description provided for @statusDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسودة'**
+  String get statusDraft;
+
+  /// No description provided for @statusInReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد المراجعة'**
+  String get statusInReview;
+
+  /// No description provided for @statusReturned.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُعادة للتعديل'**
+  String get statusReturned;
+
+  /// No description provided for @statusAwaitingSignature.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار التوقيع'**
+  String get statusAwaitingSignature;
+
+  /// No description provided for @statusApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'معتمدة'**
+  String get statusApproved;
+
+  /// No description provided for @periodLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{year}-{month} (النصف {half})'**
+  String periodLabel(int year, String month, int half);
+
+  /// No description provided for @attachmentPickCamera.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكاميرا'**
+  String get attachmentPickCamera;
+
+  /// No description provided for @attachmentPickGallery.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعرض'**
+  String get attachmentPickGallery;
+
+  /// No description provided for @attachmentKindInitial.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفق أولي'**
+  String get attachmentKindInitial;
+
+  /// No description provided for @attachmentKindSigned.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخة موقّعة'**
+  String get attachmentKindSigned;
+
+  /// No description provided for @attachmentTypeNotAllowed.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع الملف غير مسموح. المسموح: PDF أو JPG أو PNG'**
+  String get attachmentTypeNotAllowed;
+
+  /// No description provided for @attachmentUploading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ رفع الملف...'**
+  String get attachmentUploading;
+
+  /// No description provided for @attachmentRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف المرفق'**
+  String get attachmentRemove;
+
+  /// No description provided for @attachmentRemoveConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف المرفق؟'**
+  String get attachmentRemoveConfirmTitle;
+
+  /// No description provided for @attachmentRemoveConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيتم حذف «{name}» من هذه الشهادة.'**
+  String attachmentRemoveConfirmBody(String name);
+
+  /// No description provided for @certificateDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الشهادة'**
+  String get certificateDelete;
+
+  /// No description provided for @certificateDeleteConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الشهادة؟'**
+  String get certificateDeleteConfirmTitle;
+
+  /// No description provided for @certificateDeleteConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيتم حذف هذه المسودة ومرفقاتها.'**
+  String get certificateDeleteConfirmBody;
+
+  /// No description provided for @certificateDraftSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ المسودة'**
+  String get certificateDraftSaved;
+
+  /// No description provided for @certificateAmountInvalid.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل مبلغًا صحيحًا بحد أقصى منزلتين عشريتين'**
+  String get certificateAmountInvalid;
+
+  /// No description provided for @deleteButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get deleteButton;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -65,7 +65,8 @@ void main() {
 
     test('rejects a service_role JWT', () {
       expect(
-        () => AppConfig.parse(url: 'https://example.supabase.co', key: _jwtWithRole('service_role')),
+        () =>
+            AppConfig.parse(url: 'https://example.supabase.co', key: _jwtWithRole('service_role')),
         throwsA(isA<ConfigException>()),
       );
     });
