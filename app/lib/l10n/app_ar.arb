@@ -73,5 +73,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "usersSearchHint": "ابحث بالاسم أو البريد الإلكتروني",
+  "usersEmpty": "لا يوجد مستخدمون بعد. ادعُ مستخدمًا جديدًا",
+  "usersEmptySearch": "لا يوجد مستخدمون مطابقون للبحث",
+  "userInvite": "دعوة مستخدم",
+  "userInviteTitle": "دعوة مستخدم جديد",
+  "userEditTitle": "تعديل المستخدم",
+  "userRoleLabel": "الدور",
+  "userRoleAdmin": "مسؤول",
+  "userRoleSiteUser": "مستخدم موقع",
+  "userSiteCount": "{count, plural, zero{لا مواقع} one{موقع واحد} two{موقعان} few{{count} مواقع} many{{count} موقعًا} other{{count} موقع}}",
+  "@userSiteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "userActive": "نشط",
+  "userInactive": "غير نشط",
+  "userInvitePending": "دعوة معلّقة",
+  "userFullNameLabel": "الاسم الكامل",
+  "userSitesLabel": "المواقع",
+  "userNoSites": "لا مواقع مسندة",
+  "userActiveLabel": "الحساب مفعّل",
+  "userSelfEditHint": "لا يمكنك تغيير دورك أو تعطيل حسابك من هنا",
+  "userExists": "هذا البريد الإلكتروني مسجّل من قبل",
+  "inviteInvalidSites": "بعض المواقع المختارة غير صالحة. أعد المحاولة",
+  "inviteNotConfigured": "خدمة الدعوات غير مهيأة. تواصل مع مسؤول النظام",
+  "lastAdminError": "لا يمكن تعطيل آخر مسؤول أو تغيير دوره"
 }

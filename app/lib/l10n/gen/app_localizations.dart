@@ -409,6 +409,138 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'سينتقل الموقع «{name}» إلى قائمة المواقع المؤرشفة. يمكنك استعادته لاحقًا.'**
   String siteArchiveConfirmBody(String name);
+
+  /// No description provided for @usersSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث بالاسم أو البريد الإلكتروني'**
+  String get usersSearchHint;
+
+  /// No description provided for @usersEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد مستخدمون بعد. ادعُ مستخدمًا جديدًا'**
+  String get usersEmpty;
+
+  /// No description provided for @usersEmptySearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد مستخدمون مطابقون للبحث'**
+  String get usersEmptySearch;
+
+  /// No description provided for @userInvite.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعوة مستخدم'**
+  String get userInvite;
+
+  /// No description provided for @userInviteTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعوة مستخدم جديد'**
+  String get userInviteTitle;
+
+  /// No description provided for @userEditTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل المستخدم'**
+  String get userEditTitle;
+
+  /// No description provided for @userRoleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدور'**
+  String get userRoleLabel;
+
+  /// No description provided for @userRoleAdmin.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسؤول'**
+  String get userRoleAdmin;
+
+  /// No description provided for @userRoleSiteUser.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستخدم موقع'**
+  String get userRoleSiteUser;
+
+  /// No description provided for @userSiteCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, zero{لا مواقع} one{موقع واحد} two{موقعان} few{{count} مواقع} many{{count} موقعًا} other{{count} موقع}}'**
+  String userSiteCount(int count);
+
+  /// No description provided for @userActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشط'**
+  String get userActive;
+
+  /// No description provided for @userInactive.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير نشط'**
+  String get userInactive;
+
+  /// No description provided for @userInvitePending.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعوة معلّقة'**
+  String get userInvitePending;
+
+  /// No description provided for @userFullNameLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الكامل'**
+  String get userFullNameLabel;
+
+  /// No description provided for @userSitesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'المواقع'**
+  String get userSitesLabel;
+
+  /// No description provided for @userNoSites.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا مواقع مسندة'**
+  String get userNoSites;
+
+  /// No description provided for @userActiveLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحساب مفعّل'**
+  String get userActiveLabel;
+
+  /// No description provided for @userSelfEditHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكنك تغيير دورك أو تعطيل حسابك من هنا'**
+  String get userSelfEditHint;
+
+  /// No description provided for @userExists.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا البريد الإلكتروني مسجّل من قبل'**
+  String get userExists;
+
+  /// No description provided for @inviteInvalidSites.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعض المواقع المختارة غير صالحة. أعد المحاولة'**
+  String get inviteInvalidSites;
+
+  /// No description provided for @inviteNotConfigured.
+  ///
+  /// In ar, this message translates to:
+  /// **'خدمة الدعوات غير مهيأة. تواصل مع مسؤول النظام'**
+  String get inviteNotConfigured;
+
+  /// No description provided for @lastAdminError.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تعطيل آخر مسؤول أو تغيير دوره'**
+  String get lastAdminError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

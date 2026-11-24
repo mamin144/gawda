@@ -173,4 +173,82 @@ class AppLocalizationsAr extends AppLocalizations {
   String siteArchiveConfirmBody(String name) {
     return 'سينتقل الموقع «$name» إلى قائمة المواقع المؤرشفة. يمكنك استعادته لاحقًا.';
   }
+
+  @override
+  String get usersSearchHint => 'ابحث بالاسم أو البريد الإلكتروني';
+
+  @override
+  String get usersEmpty => 'لا يوجد مستخدمون بعد. ادعُ مستخدمًا جديدًا';
+
+  @override
+  String get usersEmptySearch => 'لا يوجد مستخدمون مطابقون للبحث';
+
+  @override
+  String get userInvite => 'دعوة مستخدم';
+
+  @override
+  String get userInviteTitle => 'دعوة مستخدم جديد';
+
+  @override
+  String get userEditTitle => 'تعديل المستخدم';
+
+  @override
+  String get userRoleLabel => 'الدور';
+
+  @override
+  String get userRoleAdmin => 'مسؤول';
+
+  @override
+  String get userRoleSiteUser => 'مستخدم موقع';
+
+  @override
+  String userSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
+      one: 'موقع واحد',
+      zero: 'لا مواقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get userActive => 'نشط';
+
+  @override
+  String get userInactive => 'غير نشط';
+
+  @override
+  String get userInvitePending => 'دعوة معلّقة';
+
+  @override
+  String get userFullNameLabel => 'الاسم الكامل';
+
+  @override
+  String get userSitesLabel => 'المواقع';
+
+  @override
+  String get userNoSites => 'لا مواقع مسندة';
+
+  @override
+  String get userActiveLabel => 'الحساب مفعّل';
+
+  @override
+  String get userSelfEditHint => 'لا يمكنك تغيير دورك أو تعطيل حسابك من هنا';
+
+  @override
+  String get userExists => 'هذا البريد الإلكتروني مسجّل من قبل';
+
+  @override
+  String get inviteInvalidSites => 'بعض المواقع المختارة غير صالحة. أعد المحاولة';
+
+  @override
+  String get inviteNotConfigured => 'خدمة الدعوات غير مهيأة. تواصل مع مسؤول النظام';
+
+  @override
+  String get lastAdminError => 'لا يمكن تعطيل آخر مسؤول أو تغيير دوره';
 }

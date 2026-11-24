@@ -16,6 +16,8 @@ import 'package:gawda_app/features/admin/presentation/admin_shell.dart';
 import 'package:gawda_app/features/sites/domain/entities/site.dart';
 import 'package:gawda_app/features/sites/domain/repositories/sites_repository.dart';
 import 'package:gawda_app/features/sites/presentation/pages/sites_page.dart';
+import 'package:gawda_app/features/users/domain/entities/managed_user.dart';
+import 'package:gawda_app/features/users/domain/repositories/users_repository.dart';
 import 'package:gawda_app/features/users/presentation/pages/users_page.dart';
 import 'package:gawda_app/l10n/gen/app_localizations.dart';
 import 'package:mocktail/mocktail.dart';
@@ -24,9 +26,12 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockSitesRepository extends Mock implements SitesRepository {}
 
+class MockUsersRepository extends Mock implements UsersRepository {}
+
 void main() {
   late MockAuthRepository repo;
   late MockSitesRepository sitesRepo;
+  late MockUsersRepository usersRepo;
 
   const admin = AppUser(id: 'a', fullName: 'مدير (seed)', role: UserRole.admin, isActive: true);
   const site = AppUser(id: 's', fullName: 'موقع (seed)', role: UserRole.siteUser, isActive: true);
@@ -37,12 +42,15 @@ void main() {
     when(() => repo.signOut()).thenAnswer((_) async => const Right(null));
     sitesRepo = MockSitesRepository();
     when(() => sitesRepo.list()).thenAnswer((_) async => const Right(<Site>[]));
+    usersRepo = MockUsersRepository();
+    when(() => usersRepo.list()).thenAnswer((_) async => const Right(<ManagedUser>[]));
   });
 
   Widget buildApp(SessionCubit cubit, GoRouter router) => MultiRepositoryProvider(
     providers: [
       RepositoryProvider<AuthRepository>.value(value: repo),
       RepositoryProvider<SitesRepository>.value(value: sitesRepo),
+      RepositoryProvider<UsersRepository>.value(value: usersRepo),
     ],
     child: BlocProvider<SessionCubit>.value(
       value: cubit,
