@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
@@ -9,6 +11,7 @@ import '../../../sites/domain/repositories/sites_repository.dart';
 import '../../domain/entities/attachment.dart';
 import '../../domain/entities/attachment_kind.dart';
 import '../../domain/entities/certificate.dart';
+import '../../domain/entities/certificate_status.dart';
 import '../../domain/repositories/certificates_repository.dart';
 
 sealed class CertificateState {
@@ -78,10 +81,125 @@ final class CertificateError extends CertificateState {
 }
 
 class CertificateCubit extends Cubit<CertificateState> {
-  CertificateCubit(this._certsRepo, this._sitesRepo) : super(const CertificateLoading());
+  CertificateCubit(
+    this._certsRepo,
+    this._sitesRepo, {
+    this.autoSaveDelay = const Duration(seconds: 2),
+  }) : super(const CertificateLoading());
 
   final CertificatesRepository _certsRepo;
   final SitesRepository _sitesRepo;
+
+  /// Quiet period after the last edit before an automatic draft save.
+  final Duration autoSaveDelay;
+
+  Timer? _autoSaveTimer;
+
+  /// Tail of the save queue: saves run one after another so a second save
+  /// sees the certificate created by the first and updates it.
+  Future<bool> _saveQueue = Future.value(true);
+
+  @override
+  Future<void> close() {
+    _autoSaveTimer?.cancel();
+    return super.close();
+  }
+
+  /// Creates the draft when none is open, otherwise updates the open
+  /// draft/returned certificate. Calls are serialized.
+  Future<bool> saveDraft({
+    required String siteId,
+    required DateTime date,
+    required String amount,
+    String? notes,
+  }) {
+    final next = _saveQueue.then(
+      (_) => _saveNow(siteId: siteId, date: date, amount: amount, notes: notes),
+    );
+    _saveQueue = next.catchError((Object _) => false);
+    return next;
+  }
+
+  Future<bool> _saveNow({
+    required String siteId,
+    required DateTime date,
+    required String amount,
+    String? notes,
+  }) async {
+    if (isClosed) return false;
+    final current = state is CertificateLoaded ? (state as CertificateLoaded).certificate : null;
+    if (current == null) {
+      return createDraft(siteId: siteId, certificateDate: date, amount: amount, notes: notes);
+    }
+    if (current.status != CertificateStatus.draft && current.status != CertificateStatus.returned) {
+      _setError(const BusinessRuleFailure('invalid_transition'));
+      return false;
+    }
+    return updateDraft(current.id, certificateDate: date, amount: amount, notes: notes);
+  }
+
+  /// Debounced [saveDraft]: only the last call within [autoSaveDelay] saves,
+  /// and only when a site is selected and the amount is not blank.
+  void scheduleAutoSave({
+    required String? siteId,
+    required DateTime date,
+    required String amount,
+    String? notes,
+  }) {
+    _autoSaveTimer?.cancel();
+    if (siteId == null || amount.trim().isEmpty) return;
+    _autoSaveTimer = Timer(autoSaveDelay, () {
+      if (isClosed) return;
+      unawaited(saveDraft(siteId: siteId, date: date, amount: amount, notes: notes));
+    });
+  }
+
+  /// Soft-deletes [id] and clears the open certificate.
+  Future<bool> deleteCertificate(String id) async {
+    _autoSaveTimer?.cancel();
+    final result = await _certsRepo.delete(id);
+    if (isClosed) return result.isRight();
+    if (result case Left(value: final failure)) {
+      _setError(failure);
+      return false;
+    }
+    if (state case final CertificateLoaded loaded) {
+      emit(
+        CertificateLoaded(
+          sites: loaded.sites,
+          records: loaded.records.where((c) => c.id != id).toList(growable: false),
+        ),
+      );
+    }
+    return true;
+  }
+
+  /// Soft-deletes attachment [id] and reloads the open certificate's files.
+  Future<bool> removeAttachment(String id) async {
+    final result = await _certsRepo.removeAttachment(id);
+    if (isClosed) return result.isRight();
+    if (result case Left(value: final failure)) {
+      _setError(failure);
+      return false;
+    }
+    await _reloadAttachments();
+    return true;
+  }
+
+  Future<void> _reloadAttachments() async {
+    final certId = state is CertificateLoaded ? (state as CertificateLoaded).certificate?.id : null;
+    if (certId == null) return;
+    final attResult = await _certsRepo.listAttachments(certId);
+    if (isClosed) return;
+    switch (attResult) {
+      case Right(value: final atts):
+        if (state case final CertificateLoaded loaded) {
+          emit(loaded.copyWith(attachments: atts, clearActionError: true));
+        }
+      case Left(value: final failure):
+        _setError(failure);
+    }
+  }
 
   Future<void> loadSites() async {
     emit(const CertificateLoading());
@@ -172,18 +290,12 @@ class CertificateCubit extends Cubit<CertificateState> {
       sha256Hex: sha256Hex,
       storagePath: storagePath,
     );
+    if (isClosed) return result.isRight();
     if (result case Left(value: final failure)) {
       _setError(failure);
       return false;
     }
-    // reload attachments
-    final attResult = await _certsRepo.listAttachments(certificateId);
-    if (isClosed) return true;
-    if (attResult case Right(value: final atts)) {
-      if (state case final CertificateLoaded loaded) {
-        emit(loaded.copyWith(attachments: atts, clearActionError: true));
-      }
-    }
+    await _reloadAttachments();
     return true;
   }
 
