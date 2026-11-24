@@ -22,6 +22,16 @@ void main() {
     (const SessionAuthenticated(site), '/splash', '/site'),
     (const SessionAuthenticated(site), '/admin', '/site'),
     (const SessionAuthenticated(site), '/site', null),
+    // P3: every location under /admin is admin-only, every one under /site
+    // is site-user-only. Segment-prefix match, so /administrator is not /admin.
+    (const SessionAuthenticated(site), '/admin/sites', '/site'),
+    (const SessionAuthenticated(site), '/admin/users', '/site'),
+    (const SessionAuthenticated(admin), '/admin/users', null),
+    (const SessionAuthenticated(admin), '/admin/sites', null),
+    (const SessionAuthenticated(admin), '/site/anything', '/admin'),
+    (const SessionAuthenticated(site), '/site/anything', null),
+    (const SessionAuthenticated(site), '/administrator', null),
+    (const SessionAuthenticated(admin), '/sites', null),
   ];
 
   for (final (session, location, expected) in cases) {

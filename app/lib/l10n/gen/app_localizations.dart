@@ -211,6 +211,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'مرحبًا، {name}'**
   String welcomeUser(String name);
+
+  /// No description provided for @navOverview.
+  ///
+  /// In ar, this message translates to:
+  /// **'نظرة عامة'**
+  String get navOverview;
+
+  /// No description provided for @navSites.
+  ///
+  /// In ar, this message translates to:
+  /// **'المواقع'**
+  String get navSites;
+
+  /// No description provided for @navUsers.
+  ///
+  /// In ar, this message translates to:
+  /// **'المستخدمون'**
+  String get navUsers;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

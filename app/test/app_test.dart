@@ -7,12 +7,24 @@ import 'package:gawda_app/features/auth/domain/entities/app_user.dart';
 import 'package:gawda_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:gawda_app/features/auth/presentation/pages/login_page.dart';
 import 'package:gawda_app/features/home/presentation/pages/admin_home_page.dart';
+import 'package:gawda_app/features/admin/presentation/admin_shell.dart';
+import 'package:gawda_app/features/sites/domain/repositories/sites_repository.dart';
+import 'package:gawda_app/features/users/domain/repositories/users_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
+class MockSitesRepository extends Mock implements SitesRepository {}
+
+class MockUsersRepository extends Mock implements UsersRepository {}
+
 void main() {
   late MockAuthRepository repo;
+  final sitesRepo = MockSitesRepository();
+  final usersRepo = MockUsersRepository();
+
+  App buildApp() => App(repo: repo, sitesRepo: sitesRepo, usersRepo: usersRepo);
 
   const admin = AppUser(id: 'a', fullName: 'مدير (seed)', role: UserRole.admin, isActive: true);
 
@@ -25,7 +37,7 @@ void main() {
   testWidgets('App boots to the Arabic RTL login when no session exists', (tester) async {
     when(() => repo.restoreSession()).thenAnswer((_) async => const Left(NoSessionFailure()));
 
-    await tester.pumpWidget(App(repo: repo));
+    await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginPage), findsOneWidget);
@@ -38,10 +50,21 @@ void main() {
   testWidgets('App boots to the admin home when an admin session is restored', (tester) async {
     when(() => repo.restoreSession()).thenAnswer((_) async => const Right(admin));
 
-    await tester.pumpWidget(App(repo: repo));
+    await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(AdminHomePage), findsOneWidget);
+  });
+
+  testWidgets('App provides the sites and users repositories to the admin shell', (tester) async {
+    when(() => repo.restoreSession()).thenAnswer((_) async => const Right(admin));
+
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    final shell = tester.element(find.byType(AdminShell));
+    expect(shell.read<SitesRepository>(), same(sitesRepo));
+    expect(shell.read<UsersRepository>(), same(usersRepo));
   });
 
   testWidgets('ConfigErrorApp shows the Arabic configuration error', (tester) async {

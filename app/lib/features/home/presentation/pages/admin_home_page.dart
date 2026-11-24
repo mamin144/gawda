@@ -5,8 +5,8 @@ import '../../../../core/widgets/loading_view.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../auth/presentation/bloc/session_cubit.dart';
 
-/// P2 placeholder. The admin dashboard, side navigation and management
-/// screens arrive in P3/P5/P6 — nothing beyond the role home is built here.
+/// Overview body of the admin shell (`/admin`). The app bar, side navigation
+/// and logout live in `AdminShell`; the dashboard arrives in a later phase.
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({super.key});
 
@@ -15,20 +15,11 @@ class AdminHomePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final state = context.watch<SessionCubit>().state;
     final user = state is SessionAuthenticated ? state.user : null;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.adminHomeTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.logoutButton,
-            onPressed: () => context.read<SessionCubit>().signOut(),
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
-      body: user == null
-          ? const LoadingView()
-          : Center(child: Text(l10n.welcomeUser(user.fullName), style: Theme.of(context).textTheme.titleLarge)),
+    if (user == null) {
+      return const LoadingView();
+    }
+    return Center(
+      child: Text(l10n.welcomeUser(user.fullName), style: Theme.of(context).textTheme.titleLarge),
     );
   }
 }

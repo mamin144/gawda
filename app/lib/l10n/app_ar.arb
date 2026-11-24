@@ -26,5 +26,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "navOverview": "نظرة عامة",
+  "navSites": "المواقع",
+  "navUsers": "المستخدمون"
 }

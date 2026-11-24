@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin/presentation/admin_shell.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/login_cubit.dart';
@@ -11,6 +12,8 @@ import '../../features/auth/presentation/bloc/session_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/home/presentation/pages/admin_home_page.dart';
 import '../../features/home/presentation/pages/site_home_page.dart';
+import '../../features/sites/presentation/pages/sites_page.dart';
+import '../../features/users/presentation/pages/users_page.dart';
 import '../widgets/loading_view.dart';
 
 /// Pure redirect logic, unit-tested without a router or widget tree.
@@ -27,14 +30,17 @@ String? _authenticatedRedirect(UserRole role, String location) {
   if (location == '/splash' || location == '/login') {
     return home;
   }
-  if (location == '/admin' && role != UserRole.admin) {
+  if (_isUnder(location, '/admin') && role != UserRole.admin) {
     return '/site';
   }
-  if (location == '/site' && role != UserRole.siteUser) {
+  if (_isUnder(location, '/site') && role != UserRole.siteUser) {
     return '/admin';
   }
   return null;
 }
+
+/// Segment-prefix match: `/admin` and `/admin/...`, never `/administrator`.
+bool _isUnder(String location, String root) => location == root || location.startsWith('$root/');
 
 /// Re-runs router redirects whenever the session changes.
 GoRouter buildRouter(SessionCubit cubit) => GoRouter(
@@ -51,7 +57,14 @@ GoRouter buildRouter(SessionCubit cubit) => GoRouter(
         child: const LoginPage(),
       ),
     ),
-    GoRoute(path: '/admin', builder: (context, state) => const AdminHomePage()),
+    ShellRoute(
+      builder: (context, state, child) => AdminShell(child: child),
+      routes: [
+        GoRoute(path: '/admin', builder: (context, state) => const AdminHomePage()),
+        GoRoute(path: '/admin/sites', builder: (context, state) => const SitesPage()),
+        GoRoute(path: '/admin/users', builder: (context, state) => const UsersPage()),
+      ],
+    ),
     GoRoute(path: '/site', builder: (context, state) => const SiteHomePage()),
   ],
 );

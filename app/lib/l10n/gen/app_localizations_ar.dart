@@ -70,4 +70,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String welcomeUser(String name) {
     return 'مرحبًا، $name';
   }
+
+  @override
+  String get navOverview => 'نظرة عامة';
+
+  @override
+  String get navSites => 'المواقع';
+
+  @override
+  String get navUsers => 'المستخدمون';
 }

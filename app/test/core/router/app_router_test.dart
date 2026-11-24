@@ -12,6 +12,9 @@ import 'package:gawda_app/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:gawda_app/features/auth/presentation/pages/login_page.dart';
 import 'package:gawda_app/features/home/presentation/pages/admin_home_page.dart';
 import 'package:gawda_app/features/home/presentation/pages/site_home_page.dart';
+import 'package:gawda_app/features/admin/presentation/admin_shell.dart';
+import 'package:gawda_app/features/sites/presentation/pages/sites_page.dart';
+import 'package:gawda_app/features/users/presentation/pages/users_page.dart';
 import 'package:gawda_app/l10n/gen/app_localizations.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -82,5 +85,57 @@ void main() {
 
     expect(find.byType(SiteHomePage), findsOneWidget);
     expect(find.byType(AdminHomePage), findsNothing);
+  });
+
+  testWidgets('admin deep link to /admin/users renders the users page inside the shell', (
+    tester,
+  ) async {
+    when(() => repo.restoreSession()).thenAnswer((_) async => const Right(admin));
+    final cubit = SessionCubit(repo);
+    addTearDown(cubit.close);
+    final router = buildRouter(cubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(buildApp(cubit, router));
+    await tester.pumpAndSettle();
+    expect(find.byType(AdminShell), findsOneWidget);
+    expect(find.byType(AdminHomePage), findsOneWidget);
+
+    router.go('/admin/users');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AdminShell), findsOneWidget);
+    expect(find.byType(UsersPage), findsOneWidget);
+  });
+
+  testWidgets('admin can open /admin/sites inside the shell', (tester) async {
+    when(() => repo.restoreSession()).thenAnswer((_) async => const Right(admin));
+    final cubit = SessionCubit(repo);
+    addTearDown(cubit.close);
+    final router = buildRouter(cubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(buildApp(cubit, router));
+    await tester.pumpAndSettle();
+    router.go('/admin/sites');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SitesPage), findsOneWidget);
+  });
+
+  testWidgets('site user deep-linking /admin/sites is redirected back to /site', (tester) async {
+    when(() => repo.restoreSession()).thenAnswer((_) async => const Right(site));
+    final cubit = SessionCubit(repo);
+    addTearDown(cubit.close);
+    final router = buildRouter(cubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(buildApp(cubit, router));
+    await tester.pumpAndSettle();
+    router.go('/admin/sites');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SiteHomePage), findsOneWidget);
+    expect(find.byType(AdminShell), findsNothing);
   });
 }
