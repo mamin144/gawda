@@ -93,6 +93,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorBusinessRule => 'لا يمكن تنفيذ هذا الإجراء وفق قواعد النظام';
 
   @override
+  String get errorHasSites => 'لا يمكن ترقية مستخدم مرتبط بمواقع إلى مسؤول. أزل ربط المواقع أولًا';
+
+  @override
+  String get errorAlreadyDeleted => 'تم حذف هذا العنصر من قبل';
+
+  @override
+  String get errorInvalidTransition => 'لا يمكن تنفيذ هذا الإجراء في الحالة الحالية للشهادة';
+
+  @override
+  String get errorNotFound => 'العنصر غير موجود';
+
+  @override
   String fieldTooLong(int max) {
     return 'يجب ألا يزيد عن $max حرفًا';
   }

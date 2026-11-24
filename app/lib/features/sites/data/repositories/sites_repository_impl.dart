@@ -8,10 +8,9 @@ import '../models/site_row.dart';
 import '../services/sites_service.dart';
 
 class SitesRepositoryImpl implements SitesRepository {
-  SitesRepositoryImpl(this._service, {DateTime Function()? now}) : _now = now ?? DateTime.now;
+  SitesRepositoryImpl(this._service);
 
   final SitesService _service;
-  final DateTime Function() _now;
 
   /// Rows arrive ordered by code from the service; order is preserved.
   @override
@@ -28,15 +27,11 @@ class SitesRepositoryImpl implements SitesRepository {
   Future<Result<Site>> update(String id, {required String code, required String name}) =>
       _guard(() async => _toSite(await _service.updateSite(id, {'code': code, 'name': name})));
 
-  /// `is_active` and `archived_at` always change together; the database
-  /// rejects anything else with `archive_inconsistent`.
+  /// Sends only `is_active`; the database derives `archived_at` (R3).
   @override
-  Future<Result<Site>> setArchived(String id, {required bool archived}) => _guard(() async {
-    final values = archived
-        ? <String, dynamic>{'is_active': false, 'archived_at': _now().toUtc().toIso8601String()}
-        : <String, dynamic>{'is_active': true, 'archived_at': null};
-    return _toSite(await _service.updateSite(id, values));
-  });
+  Future<Result<Site>> setArchived(String id, {required bool archived}) => _guard(
+    () async => _toSite(await _service.updateSite(id, {'is_active': !archived})),
+  );
 
   Site _toSite(Map<String, dynamic> row) => SiteRow.fromJson(row).toDomain();
 

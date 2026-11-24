@@ -34,6 +34,10 @@
   "errorDuplicate": "هذه القيمة مستخدمة من قبل",
   "errorForbidden": "ليست لديك صلاحية لتنفيذ هذا الإجراء",
   "errorBusinessRule": "لا يمكن تنفيذ هذا الإجراء وفق قواعد النظام",
+  "errorHasSites": "لا يمكن ترقية مستخدم مرتبط بمواقع إلى مسؤول. أزل ربط المواقع أولًا",
+  "errorAlreadyDeleted": "تم حذف هذا العنصر من قبل",
+  "errorInvalidTransition": "لا يمكن تنفيذ هذا الإجراء في الحالة الحالية للشهادة",
+  "errorNotFound": "العنصر غير موجود",
   "fieldTooLong": "يجب ألا يزيد عن {max} حرفًا",
   "@fieldTooLong": {
     "placeholders": {

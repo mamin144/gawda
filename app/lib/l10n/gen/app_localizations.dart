@@ -254,6 +254,30 @@ abstract class AppLocalizations {
   /// **'لا يمكن تنفيذ هذا الإجراء وفق قواعد النظام'**
   String get errorBusinessRule;
 
+  /// No description provided for @errorHasSites.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن ترقية مستخدم مرتبط بمواقع إلى مسؤول. أزل ربط المواقع أولًا'**
+  String get errorHasSites;
+
+  /// No description provided for @errorAlreadyDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف هذا العنصر من قبل'**
+  String get errorAlreadyDeleted;
+
+  /// No description provided for @errorInvalidTransition.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تنفيذ هذا الإجراء في الحالة الحالية للشهادة'**
+  String get errorInvalidTransition;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'العنصر غير موجود'**
+  String get errorNotFound;
+
   /// No description provided for @fieldTooLong.
   ///
   /// In ar, this message translates to:

@@ -12,6 +12,10 @@ String failureMessage(AppFailure failure, AppLocalizations l10n) => switch (fail
   ServerFailure() => l10n.errorServer,
   DuplicateFailure() => l10n.errorDuplicate,
   ForbiddenFailure() => l10n.errorForbidden,
+  BusinessRuleFailure(code: 'has_sites') => l10n.errorHasSites,
+  BusinessRuleFailure(code: 'already_deleted') => l10n.errorAlreadyDeleted,
+  BusinessRuleFailure(code: 'invalid_transition') => l10n.errorInvalidTransition,
+  BusinessRuleFailure(code: 'not_found') => l10n.errorNotFound,
   BusinessRuleFailure() => l10n.errorBusinessRule,
   UnexpectedFailure() => l10n.errorUnexpected,
 };

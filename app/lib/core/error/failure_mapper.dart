@@ -19,18 +19,25 @@ const businessRuleCodes = {
   'invalid_sites',
   'invalid_target',
   'archive_inconsistent',
+  'has_sites',
+  'already_deleted',
+  'invalid_transition',
+  'not_found',
 };
 
 /// Maps any thrown object to the closed [AppFailure] hierarchy.
 AppFailure mapExceptionToFailure(Object error) => switch (error) {
   AuthException(code: 'invalid_credentials') => const InvalidCredentialsFailure(),
   AuthException(:final code, :final message) => ServerFailure(code: code, message: message),
+  // PostgREST rejected the JWT (expired or invalid): the session is gone.
+  PostgrestException(code: 'PGRST301') => const NoSessionFailure(),
   PostgrestException(code: '23505') => const DuplicateFailure(),
   PostgrestException(code: '42501') ||
   PostgrestException(code: 'P0001', message: 'forbidden') => const ForbiddenFailure(),
   PostgrestException(code: 'P0001', :final message) when businessRuleCodes.contains(message) =>
     BusinessRuleFailure(message),
   PostgrestException(:final code, :final message) => ServerFailure(code: code, message: message),
+  FunctionException(status: 401) => const NoSessionFailure(),
   FunctionException(status: 403) => const ForbiddenFailure(),
   // No HTTP response reached the client (transport failure, status 0).
   FunctionsFetchException() => const NetworkFailure(),

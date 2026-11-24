@@ -52,6 +52,10 @@ void main() {
       'invalid_sites',
       'invalid_target',
       'archive_inconsistent',
+      'has_sites',
+      'already_deleted',
+      'invalid_transition',
+      'not_found',
     ]) {
       test('maps P0001 $code to BusinessRuleFailure($code)', () {
         final error = PostgrestException(message: code, code: 'P0001');
@@ -65,6 +69,16 @@ void main() {
       expect(failure, isA<ServerFailure>());
       expect((failure as ServerFailure).code, 'P0001');
       expect(failure.message, 'something_else');
+    });
+
+    test('maps Edge Function HTTP 401 to NoSessionFailure', () {
+      const error = FunctionException(status: 401, details: {'error': 'unauthorized'});
+      expect(mapExceptionToFailure(error), isA<NoSessionFailure>());
+    });
+
+    test('maps PostgREST expired JWT (PGRST301) to NoSessionFailure', () {
+      const error = PostgrestException(message: 'JWT expired', code: 'PGRST301');
+      expect(mapExceptionToFailure(error), isA<NoSessionFailure>());
     });
 
     test('maps Edge Function HTTP 403 to ForbiddenFailure', () {

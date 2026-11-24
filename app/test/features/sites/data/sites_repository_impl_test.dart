@@ -14,7 +14,6 @@ class MockSitesService extends Mock implements SitesService {}
 void main() {
   late MockSitesService service;
   late SitesRepositoryImpl repo;
-  final fixedNow = DateTime.utc(2026, 11, 24, 10, 30, 15, 123);
 
   const activeRow = {
     'id': 's1',
@@ -33,7 +32,7 @@ void main() {
 
   setUp(() {
     service = MockSitesService();
-    repo = SitesRepositoryImpl(service, now: () => fixedNow);
+    repo = SitesRepositoryImpl(service);
   });
 
   group('list', () {
@@ -112,26 +111,23 @@ void main() {
   });
 
   group('setArchived', () {
-    test('archived:true sends is_active false and archived_at now (UTC ISO)', () async {
+    test('archived:true sends only is_active false (server derives archived_at)', () async {
       when(() => service.updateSite(any(), any())).thenAnswer((_) async => archivedRow);
 
       final result = await repo.setArchived('s2', archived: true);
 
       expect(result.isRight(), isTrue);
       verify(
-        () => service.updateSite('s2', {
-          'is_active': false,
-          'archived_at': fixedNow.toUtc().toIso8601String(),
-        }),
+        () => service.updateSite('s2', {'is_active': false}),
       ).called(1);
     });
 
-    test('archived:false sends is_active true and archived_at null together', () async {
+    test('archived:false sends only is_active true', () async {
       when(() => service.updateSite(any(), any())).thenAnswer((_) async => activeRow);
 
       await repo.setArchived('s1', archived: false);
 
-      verify(() => service.updateSite('s1', {'is_active': true, 'archived_at': null})).called(1);
+      verify(() => service.updateSite('s1', {'is_active': true})).called(1);
     });
 
     test('maps P0001 forbidden to ForbiddenFailure', () async {
