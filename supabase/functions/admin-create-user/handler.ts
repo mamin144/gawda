@@ -160,6 +160,33 @@ export async function handleCreateUser(
     if (!redirectTo) return json(500, { error: "config_missing" });
 
     const service = deps.serviceClient;
+
+    // Validate everything the invite cannot undo BEFORE the email is sent.
+    // Every requested site must exist and be active (archived sites are
+    // always inactive; the archived_at filter is defense in depth).
+    if (input.siteIds.length > 0) {
+      const { data: sites, error: sitesError } = await service.from("sites")
+        .select("id")
+        .in("id", input.siteIds)
+        .eq("is_active", true)
+        .is("archived_at", null);
+      if (sitesError) return json(500, { error: "internal_error" });
+      if ((sites ?? []).length !== input.siteIds.length) {
+        return json(400, { error: "invalid_sites" });
+      }
+    }
+
+    // An existing auth user must not receive another invite email. Fails
+    // closed: any RPC error stops before the invite.
+    const { data: exists, error: existsError } = await service.rpc(
+      "auth_user_exists",
+      { p_email: input.email },
+    );
+    if (existsError || typeof exists !== "boolean") {
+      return json(500, { error: "internal_error" });
+    }
+    if (exists) return json(409, { error: "user_exists" });
+
     // Only redirectTo: role and sites never go into user_metadata.
     const { data: invited, error: inviteError } = await service.auth.admin
       .inviteUserByEmail(input.email, { redirectTo });

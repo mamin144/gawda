@@ -29,7 +29,23 @@ interface FakeOptions {
   profileDelete?: Result;
   deleteUser?: Result;
   throwOnInvite?: boolean;
+  // Service-side sites table; the fake applies the handler's filters.
+  sites?: SiteRow[];
+  sitesSelectError?: Record<string, unknown>;
+  // Result of rpc('auth_user_exists').
+  userExists?: Result;
 }
+
+interface SiteRow {
+  id: string;
+  is_active: boolean;
+  archived_at: string | null;
+}
+
+const ACTIVE_SITES: SiteRow[] = [
+  { id: SITE_A, is_active: true, archived_at: null },
+  { id: SITE_B, is_active: true, archived_at: null },
+];
 
 // Fake user and service clients that log every call in order.
 function fakes(
@@ -42,6 +58,7 @@ function fakes(
   const rpcArgs: Array<[string, Record<string, unknown>]> = [];
   const invites: Array<[string, unknown]> = [];
   const jwts: string[] = [];
+  const siteFilters: string[][] = [];
 
   const userClient = (jwt: string) => {
     jwts.push(jwt);
@@ -93,6 +110,45 @@ function fakes(
       },
     },
     from: (table: string) => ({
+      // Thenable query builder supporting .in / .eq / .is filters.
+      select: (cols: string) => {
+        const filters: string[] = [];
+        const preds: Array<(row: Record<string, unknown>) => boolean> = [];
+        const builder = {
+          in: (col: string, vals: unknown[]) => {
+            filters.push(`in:${col}:${vals.join(",")}`);
+            preds.push((r) => vals.includes(r[col]));
+            return builder;
+          },
+          eq: (col: string, val: unknown) => {
+            filters.push(`eq:${col}:${val}`);
+            preds.push((r) => r[col] === val);
+            return builder;
+          },
+          is: (col: string, val: unknown) => {
+            filters.push(`is:${col}:${val}`);
+            preds.push((r) => r[col] === val);
+            return builder;
+          },
+          then: (
+            resolve: (r: Result) => unknown,
+            reject?: (e: unknown) => unknown,
+          ) => {
+            calls.push(`select:${table}:${cols}`);
+            siteFilters.push(filters);
+            const rows = (opts.sites ?? ACTIVE_SITES) as unknown as Array<
+              Record<string, unknown>
+            >;
+            const r = opts.sitesSelectError ? fail(opts.sitesSelectError) : ok(
+              rows.filter((row) => preds.every((p) => p(row))).map((
+                row,
+              ) => ({ id: row.id })),
+            );
+            return Promise.resolve(r).then(resolve, reject);
+          },
+        };
+        return builder;
+      },
       insert: (rows: unknown) => {
         calls.push(`insert:${table}`);
         inserts.push([table, rows]);
@@ -112,6 +168,9 @@ function fakes(
     rpc: (name: string, args: Record<string, unknown>) => {
       calls.push(`rpc:${name}`);
       rpcArgs.push([name, args]);
+      if (name === "auth_user_exists") {
+        return Promise.resolve(opts.userExists ?? ok(false));
+      }
       return Promise.resolve(opts.audit ?? ok());
     },
   } as unknown as SupabaseClient;
@@ -123,6 +182,7 @@ function fakes(
     rpcArgs,
     invites,
     jwts,
+    siteFilters,
   };
 }
 
@@ -160,6 +220,13 @@ const CALLER_CHECK = [
   `getUser:${JWT}`,
   `user:select:profiles:role, is_active:id=${ADMIN_ID}`,
 ];
+
+const SITES_SELECT = "select:sites:id";
+const EXISTS_RPC = "rpc:auth_user_exists";
+// Pre-invite checks for SITE_USER_BODY (sites, then email) and for an admin
+// body without sites (email only).
+const PRE_INVITE_SITE_USER = [...CALLER_CHECK, SITES_SELECT, EXISTS_RPC];
+const PRE_INVITE_ADMIN = [...CALLER_CHECK, EXISTS_RPC];
 
 // ---------------------------------------------------------------------------
 // Method and authentication
@@ -299,7 +366,7 @@ Deno.test("201 site_user: invite, profile, user_sites, audit in order", async ()
   assertEquals(res.status, 201);
   assertEquals(await json(res), { id: NEW_ID });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_SITE_USER,
     "invite",
     "insert:profiles",
     "insert:user_sites",
@@ -316,10 +383,10 @@ Deno.test("201 site_user: invite, profile, user_sites, audit in order", async ()
       { user_id: NEW_ID, site_id: SITE_B },
     ]],
   ]);
-  assertEquals(f.rpcArgs, [[
-    "audit_user_created",
-    { p_user: NEW_ID, p_actor: ADMIN_ID },
-  ]]);
+  assertEquals(f.rpcArgs, [
+    ["auth_user_exists", { p_email: "new.user@example.test" }],
+    ["audit_user_created", { p_user: NEW_ID, p_actor: ADMIN_ID }],
+  ]);
 });
 
 Deno.test("201 admin without site_ids: no user_sites insert", async () => {
@@ -331,7 +398,7 @@ Deno.test("201 admin without site_ids: no user_sites insert", async () => {
   assertEquals(res.status, 201);
   assertEquals(await json(res), { id: NEW_ID });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_ADMIN,
     "invite",
     "insert:profiles",
     "rpc:audit_user_created",
@@ -394,7 +461,7 @@ Deno.test("409 user_exists when the invite reports an already registered email",
     const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
     assertEquals(res.status, 409);
     assertEquals(await json(res), { error: "user_exists" });
-    assertEquals(f.calls, [...CALLER_CHECK, "invite"]);
+    assertEquals(f.calls, [...PRE_INVITE_SITE_USER, "invite"]);
   }
 });
 
@@ -409,7 +476,7 @@ Deno.test("500 internal_error for any other invite error, without details", asyn
   const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "internal_error" });
-  assertEquals(f.calls, [...CALLER_CHECK, "invite"]);
+  assertEquals(f.calls, [...PRE_INVITE_SITE_USER, "invite"]);
 });
 
 Deno.test("500 internal_error when the invite throws", async () => {
@@ -424,7 +491,7 @@ Deno.test("500 internal_error when the invite returns no user", async () => {
   const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "internal_error" });
-  assertEquals(f.calls, [...CALLER_CHECK, "invite"]);
+  assertEquals(f.calls, [...PRE_INVITE_SITE_USER, "invite"]);
 });
 
 // ---------------------------------------------------------------------------
@@ -436,7 +503,7 @@ Deno.test("compensation: profile insert failure deletes the auth user", async ()
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "create_failed" });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_SITE_USER,
     "invite",
     "insert:profiles",
     `deleteUser:${NEW_ID}`,
@@ -449,7 +516,7 @@ Deno.test("compensation: user_sites failure removes the profile before deleteUse
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "create_failed" });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_SITE_USER,
     "invite",
     "insert:profiles",
     "insert:user_sites",
@@ -467,7 +534,7 @@ Deno.test("compensation: audit failure removes user_sites, profile, then the aut
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "create_failed" });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_SITE_USER,
     "invite",
     "insert:profiles",
     "insert:user_sites",
@@ -487,7 +554,7 @@ Deno.test("compensation: audit failure for an admin (no user_sites) skips that s
   assertEquals(res.status, 500);
   assertEquals(await json(res), { error: "create_failed" });
   assertEquals(f.calls, [
-    ...CALLER_CHECK,
+    ...PRE_INVITE_ADMIN,
     "invite",
     "insert:profiles",
     "rpc:audit_user_created",
@@ -547,4 +614,79 @@ Deno.test("compensation: a failed deleteUser is logged and still returns create_
   } finally {
     console.error = original;
   }
+});
+
+// ---------------------------------------------------------------------------
+// Pre-invite validation: sites and existing email (no invite email is sent)
+// ---------------------------------------------------------------------------
+Deno.test("rejects unknown site id before invite", async () => {
+  // SITE_B does not exist in the sites table.
+  const f = fakes({ sites: [ACTIVE_SITES[0]] });
+  const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
+  assertEquals(res.status, 400);
+  assertEquals(await json(res), { error: "invalid_sites" });
+  assertEquals(f.invites.length, 0);
+  assertEquals(f.calls, [...CALLER_CHECK, SITES_SELECT]);
+  assertEquals(f.siteFilters, [[
+    `in:id:${SITE_A},${SITE_B}`,
+    "eq:is_active:true",
+    "is:archived_at:null",
+  ]]);
+});
+
+Deno.test("rejects archived site id before invite", async () => {
+  const f = fakes({
+    sites: [
+      ACTIVE_SITES[0],
+      { id: SITE_B, is_active: false, archived_at: "2026-11-01T00:00:00Z" },
+    ],
+  });
+  const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
+  assertEquals(res.status, 400);
+  assertEquals(await json(res), { error: "invalid_sites" });
+  assertEquals(f.invites.length, 0);
+});
+
+Deno.test("returns 409 without inviting when a profile already exists for the email", async () => {
+  const f = fakes({ userExists: ok(true) });
+  const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
+  assertEquals(res.status, 409);
+  assertEquals(await json(res), { error: "user_exists" });
+  assertEquals(f.invites.length, 0);
+  assertEquals(f.calls, [...CALLER_CHECK, SITES_SELECT, EXISTS_RPC]);
+  assertEquals(f.rpcArgs, [[
+    "auth_user_exists",
+    { p_email: "new.user@example.test" },
+  ]]);
+});
+
+Deno.test("500 internal_error when the sites query fails, no invite", async () => {
+  const f = fakes({ sitesSelectError: { message: "db down" } });
+  const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
+  assertEquals(res.status, 500);
+  assertEquals(await json(res), { error: "internal_error" });
+  assertEquals(f.invites.length, 0);
+  assertEquals(f.calls, [...CALLER_CHECK, SITES_SELECT]);
+});
+
+Deno.test("500 internal_error when auth_user_exists fails, no invite", async () => {
+  for (const r of [fail({ message: "permission denied" }), ok(null)]) {
+    const f = fakes({ userExists: r });
+    const res = await handleCreateUser(post(SITE_USER_BODY), f.deps);
+    assertEquals(res.status, 500);
+    assertEquals(await json(res), { error: "internal_error" });
+    assertEquals(f.invites.length, 0);
+    assertEquals(f.calls, PRE_INVITE_SITE_USER);
+  }
+});
+
+Deno.test("sites check is skipped when no site_ids are requested", async () => {
+  const f = fakes();
+  const res = await handleCreateUser(
+    post({ email: "s@example.test", full_name: "S", role: "site_user" }),
+    f.deps,
+  );
+  assertEquals(res.status, 201);
+  assertEquals(f.siteFilters, []);
+  assertEquals(f.calls.slice(0, 4), [...PRE_INVITE_ADMIN, "invite"]);
 });
