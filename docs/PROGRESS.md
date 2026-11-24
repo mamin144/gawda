@@ -98,5 +98,23 @@ SKILLS APPLIED: see `docs/SKILLS_LOG.md` P2 Tasks 0-8 (per-task).
 DEVIATIONS FROM PLAN: (1) `AppConfig.fromEnvironment` is a validating factory, not a const constructor (validation cannot run in const context) — recorded in SKILLS_LOG. (2) `toDomain()` moved from the freezed class body to an extension because freezed's generated class `implements` the interface and would not inherit the concrete method. (3) `AuthRepositoryImpl` constructor is positional (not named) to satisfy `prefer_initializing_formals`. (4) Gradle/Kotlin incremental caching disabled in `app/android/gradle.properties` to work around a daemon/cache registration race on this machine. (5) `usePathUrlStrategy()` added to main.dart (routing skill requirement) though Task 8's interface block did not list it.
 NEW OPEN QUESTIONS: none product-side. Owner actions: ~~provide DEV login credentials~~ DONE (owner set DEV passwords for the three seed users — verified via Supabase Auth REST API; the value is not recorded here). Review 2026-11-24: the password chosen is weak and was previously written into this file — owner must rotate all three DEV seed passwords to strong unique values (see OPEN_QUESTIONS owner actions); remaining: set `INVITE_REDIRECT_URL`, enable leaked-password protection (advisor WARN), decide on DEV SMTP, decide on merging `p1-database-security` + `p2-app-foundation` into `master`.
 
-## P3-P7: Pending
+## P3 Admin sites and users: COMPLETE (24 November 2026)
+- Branch `p3-admin-sites-users` (not pushed; no remote configured). Plan: `docs/superpowers/plans/2026-11-24-p3-admin-sites-users.md`. Q15-Q20 approved by owner (recorded in `docs/OPEN_QUESTIONS.md`).
+- Commits on this branch: `f4bb476` (owner approval) → `6045f47` (plan) → `9bbfefb` (DB guards/audit/RPCs) → `d46e565` (Edge Function hardening) → `cd99f82` (sites data layer) → `95f3d89` (users data layer) → `68a7db0` (admin shell) → `389eaa4` (sites screen) → `57f0987` (users screen) → final docs commit.
+- Delivered: admin shell with responsive side nav; sites management screen (list/search/filter, add/edit dialog, archive/restore); users management screen (list/search, invite dialog with email/full-name/role/site multi-select, edit dialog with self-lock and last-admin guard, promotion clears sites first); Edge Function `admin-create-user` redeployed (version 2, ACTIVE, verify_jwt true); DB guards + audit triggers + RPCs.
+- Flutter tests: 215 passing, 0 failing (`flutter analyze`: No issues found!).
+- Verification (Task 8):
+  - `flutter analyze` -> No issues found!
+  - `flutter test` -> 215 passed, 0 failed
+  - deno tests: admin-create-user 31 passed, finalize-certificate 17 passed, _shared 2 passed (44 total, 0 failed)
+  - `bash supabase/tests/run_remote.sh` -> Files=11, Result: PASS (10_admin_management added, 40 assertions)
+  - `flutter build web --release` -> exit 0 (`√ Built build/web`)
+  - `flutter build apk --debug` -> exit 0 (`√ Built build/app/outputs/flutter-apk/app-debug.apk`)
+  - MCP `get_advisors`: security 1 WARN (auth_leaked_password_protection, owner action); performance 5 INFO unindexed FKs + 2 INFO unused indexes (accepted, unchanged from P1)
+  - `node verify_p0.mjs` -> exit 0, Missing required: 0
+- Parked-minor fixes applied in this phase: dropped `user_exists` from `businessRuleCodes` (mapped per repository); `updateProfile` now uses `.select('id').single()` so zero-row updates surface as PGRST116 ServerFailure.
+- Deploy: `admin-create-user` version 2, ACTIVE, verify_jwt true (deployed with `--yes`).
+- Owner actions still open: set `INVITE_REDIRECT_URL`; enable leaked-password protection; decide DEV SMTP; rotate the three DEV seed passwords; decide on merging `p1-database-security` + `p2-app-foundation` + `p3-admin-sites-users` into `master`.
+
+## P4-P7: Pending
 - Status: Not started.

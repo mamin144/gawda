@@ -352,7 +352,6 @@ SKILLS APPLIED:
 - `supabase`: `Supabase.initialize(url:, publishableKey:)` uses only the publishable key from the gitignored `app/env/dev.json`; `ConfigErrorApp` fails fast with an Arabic message when config is missing/unsafe; the publishable key was scrubbed from the committed plan doc.
 - `systematic-debugging`: Gradle/Kotlin incremental-cache registration race on the first APK build diagnosed from the real error text ("Storage ... is already registered"); worked around by disabling the daemon and Kotlin incremental caching in `app/android/gradle.properties` (documented in PROGRESS.md). Emulator did not appear in `flutter devices` after the first launch attempt; re-checked with `adb devices` (emulator-5554 online) and installed via explicit `-s emulator-5554`.
 - Deviation (minor): browser-based login error flow could not be exercised through the browser tool because Flutter web renders to canvas and exposes only a minimal semantics tree; the same flow is covered by `login_page_test.dart` ("invalid credentials show the Arabic error banner", passing).
-'@; git add docs/SKILLS_LOG.md docs/PROGRESS.md; git commit -m "docs(p2): phase report and skills log for tasks 7-8" 2>&1 | Select-Object -First 2
 
 SKILLS LOADED: `flutter-apply-architecture-best-practices`, `dart-use-pattern-matching`, `ui-ux-pro-max`, `test-driven-development`, `systematic-debugging`.
 SKILLS APPLIED:
@@ -361,3 +360,37 @@ SKILLS APPLIED:
 - `ui-ux-pro-max`: visible floating labels (never placeholder-only), inline Arabic error under each invalid field, failure banner uses `errorContainer/onErrorContainer` tokens, submit disabled + spinner while pending (tested), form constrained to the new `AppSpacing.formMaxWidth` (640) token.
 - `test-driven-development`: 7 session + 5 login-cubit + 4 page widget tests written first and run RED; GREEN 64/64 total.
 - `systematic-debugging`: 27 analyzer errors traced to ONE missing `flutter_bloc` import; three test-expectation mismatches fixed against real bloc semantics (equal states are deduplicated; trim+submitting is a single emit) after reading the actual Expected/Actual diff — production code was not bent to fit wrong tests.
+
+
+### P3 Task 5: admin shell + routing
+
+SKILLS LOADED: `flutter-apply-architecture-best-practices`, `flutter-setup-declarative-routing`, `ui-ux-pro-max`, `test-driven-development`.
+SKILLS APPLIED:
+- `flutter-apply-architecture-best-practices`: lean shell view, repos provided in `app.dart`, route guards in `app_router.dart`.
+- `flutter-setup-declarative-routing`: `/admin/sites`, `/admin/users` added under the admin shell; role redirects preserved.
+- `test-driven-development`: router tests written first; GREEN.
+
+### P3 Task 6: sites management screen
+
+SKILLS LOADED: `flutter-apply-architecture-best-practices`, `test-driven-development`, `systematic-debugging`, `ui-ux-pro-max`.
+SKILLS APPLIED:
+- `flutter-apply-architecture-best-practices`: `SitesCubit` mirrors the sites data layer; dialogs return `AppFailure?`; page owns no Scaffold.
+- `test-driven-development`: 4 test files written first, run RED, then GREEN.
+- `systematic-debugging`: `RadioGroup<T>` adopted (Flutter 3.32+ API) for role selection; FAB tooltip sized >= 48dp.
+
+### P3 Task 7: users management screen
+
+SKILLS LOADED: `flutter-apply-architecture-best-practices`, `test-driven-development`, `systematic-debugging`, `ui-ux-pro-max`.
+SKILLS APPLIED:
+- `flutter-apply-architecture-best-practices`: `UsersCubit` consumes `UsersRepository` + `SitesRepository`; `UsersState` mirrors `SitesState` with `activeSites`; page owns no Scaffold; dialogs return `AppFailure?`.
+- `test-driven-development`: 4 test files written first, run RED (missing cubit/dialogs/l10n), then GREEN (34 tests).
+- `systematic-debugging`: role+active controls disabled on the signed-in admin's own row (Q15); promotion clears `user_sites` before `update` (parked P1 guard); `SiteMultiSelect` submits a sorted list; reused `invalidEmail` key instead of adding a duplicate.
+- `ui-ux-pro-max`: status chips always carry a text label (color never alone); 48dp FAB; empty/search states.
+
+### P3 Task 8: verification, deploy and phase report
+
+SKILLS LOADED: `verification-before-completion`, `supabase`, `dart-run-static-analysis`, `systematic-debugging`.
+SKILLS APPLIED:
+- `verification-before-completion`: every claim backed by a command — `flutter analyze` (No issues found!), `flutter test` (215 passed), deno (admin-create-user 31, finalize-certificate 17, _shared 2), `run_remote.sh` (Files=11, PASS), `flutter build web --release` (exit 0), `flutter build apk --debug` (exit 0), MCP `get_advisors` (1 security WARN accepted, 7 performance INFO accepted), `node verify_p0.mjs` (exit 0).
+- `supabase`: `admin-create-user` redeployed (version 2, ACTIVE, verify_jwt true) via `--yes`; advisors unchanged from P1.
+- `systematic-debugging`: applied parked minors — dropped `user_exists` from `businessRuleCodes`; `updateProfile` now uses `.select('id').single()` so zero-row updates surface as PGRST116; removed stray shell-command text from this file.
