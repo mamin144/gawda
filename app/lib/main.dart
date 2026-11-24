@@ -7,6 +7,8 @@ import 'core/config/app_config.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/data/services/auth_service.dart';
 import 'features/auth/data/services/profile_service.dart';
+import 'features/certificates/data/repositories/certificates_repository_impl.dart';
+import 'features/certificates/data/services/certificates_service.dart';
 import 'features/sites/data/repositories/sites_repository_impl.dart';
 import 'features/sites/data/services/sites_service.dart';
 import 'features/users/data/repositories/users_repository_impl.dart';
@@ -39,6 +41,7 @@ Future<void> main() async {
       repo: repo,
       sitesRepo: SitesRepositoryImpl(SupabaseSitesService(client)),
       usersRepo: UsersRepositoryImpl(SupabaseUsersService(client)),
+      certsRepo: CertificatesRepositoryImpl(SupabaseCertificatesService(client)),
     ),
   );
 }

@@ -541,6 +541,84 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا يمكن تعطيل آخر مسؤول أو تغيير دوره'**
   String get lastAdminError;
+
+  /// No description provided for @certificateDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الشهادة'**
+  String get certificateDate;
+
+  /// No description provided for @certificateAmount.
+  ///
+  /// In ar, this message translates to:
+  /// **'المبلغ'**
+  String get certificateAmount;
+
+  /// No description provided for @certificateNotes.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظات'**
+  String get certificateNotes;
+
+  /// No description provided for @certificateStatus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالة'**
+  String get certificateStatus;
+
+  /// No description provided for @certificateReturnedNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة الإرجاع'**
+  String get certificateReturnedNote;
+
+  /// No description provided for @certificateSaveDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ مسودة'**
+  String get certificateSaveDraft;
+
+  /// No description provided for @certificateSubmit.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال'**
+  String get certificateSubmit;
+
+  /// No description provided for @certificateSignedCopy.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفع النسخة الموقّعة'**
+  String get certificateSignedCopy;
+
+  /// No description provided for @attachmentUpload.
+  ///
+  /// In ar, this message translates to:
+  /// **'المرفقات'**
+  String get attachmentUpload;
+
+  /// No description provided for @attachmentPickImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'صورة'**
+  String get attachmentPickImage;
+
+  /// No description provided for @attachmentPickFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملف'**
+  String get attachmentPickFile;
+
+  /// No description provided for @attachmentTooLarge.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم الملف يتجاوز 2 ميجا'**
+  String get attachmentTooLarge;
+
+  /// No description provided for @attachmentDuplicate.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الملف مرفوع من قبل'**
+  String get attachmentDuplicate;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

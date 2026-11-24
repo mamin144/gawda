@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'core/widgets/error_view.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/presentation/bloc/session_cubit.dart';
+import 'features/certificates/domain/repositories/certificates_repository.dart';
 import 'features/sites/domain/repositories/sites_repository.dart';
 import 'features/users/domain/repositories/users_repository.dart';
 import 'l10n/gen/app_localizations.dart';
@@ -14,11 +15,12 @@ import 'l10n/gen/app_localizations.dart';
 /// Root widget: owns the session cubit and router lifecycles and wires
 /// theme, Arabic RTL localization and role-based routing together.
 class App extends StatefulWidget {
-  const App({super.key, required this.repo, required this.sitesRepo, required this.usersRepo});
+  const App({super.key, required this.repo, required this.sitesRepo, required this.usersRepo, required this.certsRepo});
 
   final AuthRepository repo;
   final SitesRepository sitesRepo;
   final UsersRepository usersRepo;
+  final CertificatesRepository certsRepo;
 
   @override
   State<App> createState() => _AppState();
@@ -49,6 +51,7 @@ class _AppState extends State<App> {
         RepositoryProvider<AuthRepository>.value(value: widget.repo),
         RepositoryProvider<SitesRepository>.value(value: widget.sitesRepo),
         RepositoryProvider<UsersRepository>.value(value: widget.usersRepo),
+        RepositoryProvider<CertificatesRepository>.value(value: widget.certsRepo),
       ],
       child: BlocProvider<SessionCubit>.value(
         value: _cubit,

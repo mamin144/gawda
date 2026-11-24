@@ -251,4 +251,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get lastAdminError => 'لا يمكن تعطيل آخر مسؤول أو تغيير دوره';
+
+  @override
+  String get certificateDate => 'تاريخ الشهادة';
+
+  @override
+  String get certificateAmount => 'المبلغ';
+
+  @override
+  String get certificateNotes => 'ملاحظات';
+
+  @override
+  String get certificateStatus => 'الحالة';
+
+  @override
+  String get certificateReturnedNote => 'ملاحظة الإرجاع';
+
+  @override
+  String get certificateSaveDraft => 'حفظ مسودة';
+
+  @override
+  String get certificateSubmit => 'إرسال';
+
+  @override
+  String get certificateSignedCopy => 'رفع النسخة الموقّعة';
+
+  @override
+  String get attachmentUpload => 'المرفقات';
+
+  @override
+  String get attachmentPickImage => 'صورة';
+
+  @override
+  String get attachmentPickFile => 'ملف';
+
+  @override
+  String get attachmentTooLarge => 'حجم الملف يتجاوز 2 ميجا';
+
+  @override
+  String get attachmentDuplicate => 'هذا الملف مرفوع من قبل';
 }

@@ -102,5 +102,18 @@
   "userExists": "هذا البريد الإلكتروني مسجّل من قبل",
   "inviteInvalidSites": "بعض المواقع المختارة غير صالحة. أعد المحاولة",
   "inviteNotConfigured": "خدمة الدعوات غير مهيأة. تواصل مع مسؤول النظام",
-  "lastAdminError": "لا يمكن تعطيل آخر مسؤول أو تغيير دوره"
+  "lastAdminError": "لا يمكن تعطيل آخر مسؤول أو تغيير دوره",
+  "certificateDate": "تاريخ الشهادة",
+  "certificateAmount": "المبلغ",
+  "certificateNotes": "ملاحظات",
+  "certificateStatus": "الحالة",
+  "certificateReturnedNote": "ملاحظة الإرجاع",
+  "certificateSaveDraft": "حفظ مسودة",
+  "certificateSubmit": "إرسال",
+  "certificateSignedCopy": "رفع النسخة الموقّعة",
+  "attachmentUpload": "المرفقات",
+  "attachmentPickImage": "صورة",
+  "attachmentPickFile": "ملف",
+  "attachmentTooLarge": "حجم الملف يتجاوز 2 ميجا",
+  "attachmentDuplicate": "هذا الملف مرفوع من قبل"
 }

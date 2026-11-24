@@ -8,6 +8,7 @@ import 'package:gawda_app/features/auth/domain/repositories/auth_repository.dart
 import 'package:gawda_app/features/auth/presentation/pages/login_page.dart';
 import 'package:gawda_app/features/home/presentation/pages/admin_home_page.dart';
 import 'package:gawda_app/features/admin/presentation/admin_shell.dart';
+import 'package:gawda_app/features/certificates/domain/repositories/certificates_repository.dart';
 import 'package:gawda_app/features/sites/domain/repositories/sites_repository.dart';
 import 'package:gawda_app/features/users/domain/repositories/users_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,14 +18,17 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockSitesRepository extends Mock implements SitesRepository {}
 
+class MockCertificatesRepository extends Mock implements CertificatesRepository {}
+
 class MockUsersRepository extends Mock implements UsersRepository {}
 
 void main() {
   late MockAuthRepository repo;
   final sitesRepo = MockSitesRepository();
   final usersRepo = MockUsersRepository();
+  final certsRepo = MockCertificatesRepository();
 
-  App buildApp() => App(repo: repo, sitesRepo: sitesRepo, usersRepo: usersRepo);
+  App buildApp() => App(repo: repo, sitesRepo: sitesRepo, usersRepo: usersRepo, certsRepo: certsRepo);
 
   const admin = AppUser(id: 'a', fullName: 'مدير (seed)', role: UserRole.admin, isActive: true);
 
