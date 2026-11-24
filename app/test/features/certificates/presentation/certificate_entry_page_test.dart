@@ -35,7 +35,7 @@ class _CancelPicker extends FilePicker {
     String? initialDirectory,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
-    Function(FilePickerStatus)? onFileLoading,
+    dynamic Function(FilePickerStatus)? onFileLoading,
     bool allowCompression = true,
     int compressionQuality = 30,
     bool allowMultiple = false,
@@ -284,7 +284,10 @@ void main() {
       [_att, _signed],
     );
     when(
-      () => certs.finalize(certificateId: any(named: 'certificateId'), actorId: any(named: 'actorId')),
+      () => certs.finalize(
+        certificateId: any(named: 'certificateId'),
+        actorId: any(named: 'actorId'),
+      ),
     ).thenAnswer((_) async => Right(_cert(status: CertificateStatus.approved)));
 
     await tester.ensureVisible(find.text(l10n.certificateSignedCopy));
@@ -307,7 +310,10 @@ void main() {
       [_att, old],
     );
     when(
-      () => certs.finalize(certificateId: any(named: 'certificateId'), actorId: any(named: 'actorId')),
+      () => certs.finalize(
+        certificateId: any(named: 'certificateId'),
+        actorId: any(named: 'actorId'),
+      ),
     ).thenAnswer((_) async => Right(_cert(status: CertificateStatus.approved)));
 
     await tester.ensureVisible(find.text(l10n.certificateSignedCopy));
@@ -317,7 +323,22 @@ void main() {
 
     expect(picker.calls, 1);
     verifyNever(
-      () => certs.finalize(certificateId: any(named: 'certificateId'), actorId: any(named: 'actorId')),
+      () => certs.finalize(
+        certificateId: any(named: 'certificateId'),
+        actorId: any(named: 'actorId'),
+      ),
     );
+  });
+
+  testWidgets('clearing the open certificate empties the form (C1)', (tester) async {
+    final cubit = await pump(tester);
+    await openExisting(tester, cubit, _cert());
+    expect(find.text('1500'), findsOneWidget);
+
+    cubit.newCertificate();
+    await tester.pumpAndSettle();
+
+    expect(find.text('1500'), findsNothing);
+    expect(find.text(l10n.certificateDelete), findsNothing);
   });
 }

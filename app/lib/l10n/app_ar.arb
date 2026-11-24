@@ -127,6 +127,7 @@
   "certificatePeriod": "فترة الشهادة",
   "noCertificates": "لا توجد شهادات بعد",
   "certificateRecords": "سجل الشهادات",
+  "certificateNew": "شهادة جديدة",
   "statusDraft": "مسودة",
   "statusInReview": "قيد المراجعة",
   "statusReturned": "مُعادة للتعديل",

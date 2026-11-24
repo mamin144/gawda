@@ -686,6 +686,12 @@ abstract class AppLocalizations {
   /// **'سجل الشهادات'**
   String get certificateRecords;
 
+  /// No description provided for @certificateNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'شهادة جديدة'**
+  String get certificateNew;
+
   /// No description provided for @statusDraft.
   ///
   /// In ar, this message translates to:

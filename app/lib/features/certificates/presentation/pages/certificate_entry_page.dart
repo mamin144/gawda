@@ -114,9 +114,17 @@ class _EntryBodyState extends State<_EntryBody> {
   }
 
   /// Fills the form from a certificate opened from the records list.
+  /// A cleared certificate ([CertificateCubit.newCertificate]) empties it.
   void _syncFrom(CertificateLoaded loaded) {
     final cert = loaded.certificate;
-    if (cert == null) return;
+    if (cert == null) {
+      setState(() {
+        _amount.clear();
+        _notes.clear();
+        _date = _today();
+      });
+      return;
+    }
     setState(() {
       _amount.text = cert.amount;
       _notes.text = cert.notes ?? '';
@@ -312,7 +320,12 @@ class _EntryBodyState extends State<_EntryBody> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return BlocConsumer<CertificateCubit, CertificateState>(
-      listenWhen: (prev, curr) => prev is CertificateLoading && curr is CertificateLoaded,
+      // Sync on an opened certificate, or when the open one is cleared; never
+      // while typing (a save only replaces the certificate with itself).
+      listenWhen: (prev, curr) =>
+          curr is CertificateLoaded &&
+          (prev is CertificateLoading ||
+              (prev is CertificateLoaded && prev.certificate != null && curr.certificate == null)),
       listener: (context, state) => _syncFrom(state as CertificateLoaded),
       builder: (context, state) => switch (state) {
         CertificateLoading() => const LoadingView(),

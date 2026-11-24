@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,10 +12,14 @@ import '../../../../l10n/gen/app_localizations.dart';
 import '../bloc/certificate_cubit.dart';
 import '../certificate_labels.dart';
 
-/// Site-user records list. Records are loaded once by the shell
-/// ([CertificateCubit.loadSitesAndRecords]); this page never reloads itself.
+/// Site-user records list over every site. Records are loaded by the shell
+/// ([CertificateCubit.loadSitesAndRecords]) and refreshed by pull-to-refresh.
+/// Tapping a row opens it in the cubit, then calls [onOpen] (the shell
+/// switches to the entry tab).
 class SiteRecordsPage extends StatelessWidget {
-  const SiteRecordsPage({super.key});
+  const SiteRecordsPage({super.key, this.onOpen});
+
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -40,21 +46,30 @@ class SiteRecordsPage extends StatelessWidget {
   Widget _list(BuildContext context, CertificateLoaded loaded) {
     final l10n = AppLocalizations.of(context);
     final spacing = Theme.of(context).extension<AppSpacing>()!;
-    return ListView.separated(
-      padding: EdgeInsets.all(spacing.lg),
-      itemCount: loaded.records.length,
-      separatorBuilder: (context, index) => SizedBox(height: spacing.sm),
-      itemBuilder: (context, i) {
-        final c = loaded.records[i];
-        return Card(
-          margin: EdgeInsets.zero,
-          child: ListTile(
-            title: Text(periodLabel(c.periodYear, c.periodMonth, c.periodHalf, l10n)),
-            subtitle: Text(certificateStatusLabel(c.status, l10n)),
-            trailing: Text(c.amount),
-          ),
-        );
-      },
+    final cubit = context.read<CertificateCubit>();
+    return RefreshIndicator(
+      onRefresh: cubit.loadAllRecords,
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(spacing.lg),
+        itemCount: loaded.records.length,
+        separatorBuilder: (context, index) => SizedBox(height: spacing.sm),
+        itemBuilder: (context, i) {
+          final c = loaded.records[i];
+          return Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              title: Text(periodLabel(c.periodYear, c.periodMonth, c.periodHalf, l10n)),
+              subtitle: Text(certificateStatusLabel(c.status, l10n)),
+              trailing: Text(c.amount),
+              onTap: () {
+                unawaited(cubit.openCertificate(c.id));
+                onOpen?.call();
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

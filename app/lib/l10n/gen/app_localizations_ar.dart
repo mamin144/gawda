@@ -325,6 +325,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certificateRecords => 'سجل الشهادات';
 
   @override
+  String get certificateNew => 'شهادة جديدة';
+
+  @override
   String get statusDraft => 'مسودة';
 
   @override

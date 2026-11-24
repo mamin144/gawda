@@ -43,11 +43,11 @@ class _ShellViewState extends State<_ShellView> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          SiteDashboardPage(),
-          _EntryTab(),
-          SiteRecordsPage(),
-          _AccountTab(),
+        children: [
+          const SiteDashboardPage(),
+          const _EntryTab(),
+          SiteRecordsPage(onOpen: () => setState(() => _index = 1)),
+          const _AccountTab(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -71,10 +71,26 @@ class _EntryTab extends StatelessWidget {
   const _EntryTab();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(AppLocalizations.of(context).siteTabEntry)),
-    body: const CertificateEntryBody(),
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final hasOpen = context.select<CertificateCubit, bool>(
+      (c) => c.state is CertificateLoaded && (c.state as CertificateLoaded).certificate != null,
+    );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.siteTabEntry),
+        actions: [
+          if (hasOpen)
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: l10n.certificateNew,
+              onPressed: context.read<CertificateCubit>().newCertificate,
+            ),
+        ],
+      ),
+      body: const CertificateEntryBody(),
+    );
+  }
 }
 
 class _AccountTab extends StatelessWidget {

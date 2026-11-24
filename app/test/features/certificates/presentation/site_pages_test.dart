@@ -47,13 +47,18 @@ void main() {
     when(() => sites.list()).thenAnswer((_) async => const Right([_s1]));
   });
 
-  Future<void> pump(WidgetTester tester, Widget page, List<Certificate> records) async {
+  Future<CertificateCubit> pump(
+    WidgetTester tester,
+    Widget page,
+    List<Certificate> records,
+  ) async {
     when(() => certs.listForSite(any())).thenAnswer((_) async => Right(records));
     final cubit = CertificateCubit(certs, sites);
     addTearDown(cubit.close);
     await cubit.loadSitesAndRecords();
     await tester.pumpWidget(wrapLocalized(BlocProvider.value(value: cubit, child: page)));
     await tester.pumpAndSettle();
+    return cubit;
   }
 
   group('SiteDashboardPage', () {
@@ -91,6 +96,32 @@ void main() {
 
       expect(find.text(l10n.noCertificates), findsOneWidget);
       verify(() => certs.listForSite('s1')).called(1);
+    });
+
+    testWidgets('tapping a record opens it and calls onOpen (C1)', (tester) async {
+      final c1 = _cert(DateTime(2026, 3, 20), CertificateStatus.returned, 'c1');
+      when(() => certs.getById(any())).thenAnswer((_) async => Right(c1));
+      when(() => certs.listAttachments(any())).thenAnswer((_) async => const Right([]));
+      var opened = 0;
+      final cubit = await pump(tester, SiteRecordsPage(onOpen: () => opened++), [c1]);
+
+      await tester.tap(find.text(l10n.statusReturned));
+      await tester.pumpAndSettle();
+
+      verify(() => certs.getById('c1')).called(1);
+      expect(opened, 1);
+      expect((cubit.state as CertificateLoaded).certificate, c1);
+    });
+
+    testWidgets('pull to refresh reloads the records (I4)', (tester) async {
+      await pump(tester, const SiteRecordsPage(), [
+        _cert(DateTime(2026, 3, 20), CertificateStatus.approved, 'c1'),
+      ]);
+
+      await tester.fling(find.text(l10n.statusApproved), const Offset(0, 400), 1000);
+      await tester.pumpAndSettle();
+
+      verify(() => certs.listForSite('s1')).called(2);
     });
   });
 }
