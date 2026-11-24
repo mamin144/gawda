@@ -108,13 +108,14 @@ select lives_ok(
 );
 
 -- 7-11: sites_archive_consistency and code normalization (Q16).
-select throws_ok(
-  format('update public.sites set is_active = false, archived_at = null where id = %L', t10.id('site3')),
-  'P0001', 'archive_inconsistent', 'is_active=false without archived_at is rejected'
-);
-select throws_ok(
+-- archived_at is derived by the server (R3, plan 2026-11-24): the client value is ignored.
+select lives_ok(
   format('insert into public.sites (code, name, is_active, archived_at) values (%L, %L, true, now())', 't10-x', 'X'),
-  'P0001', 'archive_inconsistent', 'archived_at with is_active=true is rejected'
+  'a client archived_at on an active site is accepted and ignored'
+);
+select ok(
+  (select archived_at is null from public.sites where code = 'T10-X'),
+  'an active site has no archived_at'
 );
 select lives_ok(
   format('insert into public.sites (code, name) values (%L, %L)', ' s01 ', 'T10 S01'),
