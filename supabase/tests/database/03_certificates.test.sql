@@ -114,9 +114,10 @@ select is_empty(
         'private.submit_certificate(uuid)', 'private.return_certificate(uuid,text)',
         'private.approve_for_signing(uuid)', 'private.reopen_certificate(uuid,text)',
         'private.delete_certificate(uuid,text)', 'private.attachment_path_matches(text,uuid)',
-        'private.path_site_id(text)')
+        'private.path_site_id(text)', 'private.admin_list_users()',
+        'private.admin_set_user_sites(uuid,uuid[])')
       )$$,
-  'private functions are not executable by anon; only the RLS helpers, transition functions and path checks by authenticated'
+  'private functions are not executable by anon; only the RLS helpers, transition functions, path checks and admin RPC bodies by authenticated'
 );
 select ok(
   not has_function_privilege('anon', 'private.guard_certificate_update()', 'execute')
