@@ -1,3 +1,5 @@
+import 'package:fpdart/fpdart.dart';
+
 import '../../../../core/error/result.dart';
 import '../entities/attachment.dart';
 import '../entities/attachment_kind.dart';
@@ -27,6 +29,13 @@ abstract interface class CertificatesRepository {
     String? amount,
     String? notes,
   });
+
+  /// Soft-deletes a draft/returned certificate (`delete_certificate` RPC).
+  Future<Result<Unit>> delete(String id);
+
+  /// Soft-deletes an attachment of a draft/returned certificate
+  /// (`remove_attachment` RPC). The storage object is kept.
+  Future<Result<Unit>> removeAttachment(String id);
 
   /// Submits a draft/returned certificate for review.
   Future<Result<Certificate>> submit(String id);

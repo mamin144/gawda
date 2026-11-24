@@ -10,7 +10,7 @@ import '../../../../core/error/result.dart';
 import '../../domain/entities/attachment.dart';
 import '../../domain/entities/attachment_kind.dart';
 import '../../domain/entities/certificate.dart';
-import '../../domain/entities/certificate_status.dart';
+import '../../domain/certificate_files.dart';
 import '../../domain/repositories/certificates_repository.dart';
 import '../models/attachment_row.dart';
 import '../models/certificate_row.dart';
@@ -41,10 +41,9 @@ class CertificatesRepositoryImpl implements CertificatesRepository {
     () async => _toCertificate(
       await _service.insertCertificate({
         'site_id': siteId,
-        'certificate_date': certificateDate.toUtc().toIso8601String().split('T').first,
+        'certificate_date': formatDbDate(certificateDate),
         'amount': amount,
         'notes': notes,
-        'status': CertificateStatus.draft.toDb(),
       }),
     ),
   );
@@ -58,11 +57,23 @@ class CertificatesRepositoryImpl implements CertificatesRepository {
   }) => _guard(() async {
     final values = <String, dynamic>{};
     if (certificateDate != null) {
-      values['certificate_date'] = certificateDate.toUtc().toIso8601String().split('T').first;
+      values['certificate_date'] = formatDbDate(certificateDate);
     }
     if (amount != null) values['amount'] = amount;
     if (notes != null) values['notes'] = notes;
     return _toCertificate(await _service.updateCertificate(id, values));
+  });
+
+  @override
+  Future<Result<Unit>> delete(String id) => _guard(() async {
+    await _service.deleteCertificate(id);
+    return unit;
+  });
+
+  @override
+  Future<Result<Unit>> removeAttachment(String id) => _guard(() async {
+    await _service.removeAttachment(id);
+    return unit;
   });
 
   @override

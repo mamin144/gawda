@@ -10,13 +10,18 @@ abstract interface class CertificatesService {
   Future<Map<String, dynamic>> fetchById(String id);
   Future<Map<String, dynamic>> insertCertificate(Map<String, dynamic> values);
   Future<Map<String, dynamic>> updateCertificate(String id, Map<String, dynamic> values);
-  Future<void> softDeleteCertificate(String id);
+
+  /// Soft-deletes through the `delete_certificate` RPC (draft/returned only).
+  Future<Map<String, dynamic>> deleteCertificate(String id);
 
   Future<Map<String, dynamic>> submitCertificate(String id);
 
+  /// Attachments of [certificateId] that are not soft-deleted.
   Future<List<Map<String, dynamic>>> fetchAttachments(String certificateId);
   Future<Map<String, dynamic>> insertAttachment(Map<String, dynamic> values);
-  Future<void> softDeleteAttachment(String id);
+
+  /// Soft-deletes through the `remove_attachment` RPC; the object is kept.
+  Future<Map<String, dynamic>> removeAttachment(String id);
 
   /// Uploads [bytes] to [storagePath] in the private `certificates` bucket.
   Future<void> uploadFile(String storagePath, Uint8List bytes, String mime);
@@ -76,12 +81,8 @@ class SupabaseCertificatesService implements CertificatesService {
   }
 
   @override
-  Future<void> softDeleteCertificate(String id) async {
-    await _client
-        .from('certificates')
-        .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', id);
-  }
+  Future<Map<String, dynamic>> deleteCertificate(String id) =>
+      _client.rpc<Map<String, dynamic>>('delete_certificate', params: {'p_id': id});
 
   @override
   Future<Map<String, dynamic>> submitCertificate(String id) async {
@@ -95,6 +96,7 @@ class SupabaseCertificatesService implements CertificatesService {
         .from('attachments')
         .select(_attColumns)
         .eq('certificate_id', certificateId)
+        .isFilter('deleted_at', null)
         .order('uploaded_at', ascending: true);
     return rows.cast<Map<String, dynamic>>();
   }
@@ -106,9 +108,8 @@ class SupabaseCertificatesService implements CertificatesService {
   }
 
   @override
-  Future<void> softDeleteAttachment(String id) async {
-    await _client.from('attachments').delete().eq('id', id);
-  }
+  Future<Map<String, dynamic>> removeAttachment(String id) =>
+      _client.rpc<Map<String, dynamic>>('remove_attachment', params: {'p_id': id});
 
   @override
   Future<void> uploadFile(String storagePath, Uint8List bytes, String mime) async {
