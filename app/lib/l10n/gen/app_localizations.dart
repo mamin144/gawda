@@ -619,6 +619,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'هذا الملف مرفوع من قبل'**
   String get attachmentDuplicate;
+
+  /// No description provided for @siteTabDashboard.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
+  String get siteTabDashboard;
+
+  /// No description provided for @siteTabEntry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدخال'**
+  String get siteTabEntry;
+
+  /// No description provided for @siteTabRecords.
+  ///
+  /// In ar, this message translates to:
+  /// **'السجلات'**
+  String get siteTabRecords;
+
+  /// No description provided for @siteTabAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابي'**
+  String get siteTabAccount;
+
+  /// No description provided for @certificatePeriod.
+  ///
+  /// In ar, this message translates to:
+  /// **'فترة الشهادة'**
+  String get certificatePeriod;
+
+  /// No description provided for @noCertificates.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد شهادات بعد'**
+  String get noCertificates;
+
+  /// No description provided for @certificateRecords.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجل الشهادات'**
+  String get certificateRecords;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

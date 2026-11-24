@@ -10,7 +10,7 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/login_cubit.dart';
 import '../../features/auth/presentation/bloc/session_cubit.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/certificates/presentation/pages/certificate_entry_page.dart';
+import '../../features/certificates/presentation/pages/site_shell.dart';
 import '../../features/home/presentation/pages/admin_home_page.dart';
 import '../../features/sites/presentation/pages/sites_page.dart';
 import '../../features/users/presentation/pages/users_page.dart';
@@ -65,7 +65,7 @@ GoRouter buildRouter(SessionCubit cubit) => GoRouter(
         GoRoute(path: '/admin/users', builder: (context, state) => const UsersPage()),
       ],
     ),
-    GoRoute(path: '/site', builder: (context, state) => const CertificateEntryPage()),
+    GoRoute(path: '/site', builder: (context, state) => const SiteShell()),
   ],
 );
 

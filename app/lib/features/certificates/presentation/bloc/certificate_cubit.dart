@@ -28,12 +28,14 @@ final class CertificateLoaded extends CertificateState {
     required this.sites,
     this.certificate,
     this.attachments = const [],
+    this.records = const [],
     this.actionError,
   });
 
   final List<Site> sites;
   final Certificate? certificate;
   final List<Attachment> attachments;
+  final List<Certificate> records;
   final AppFailure? actionError;
 
   CertificateLoaded copyWith({
@@ -41,6 +43,7 @@ final class CertificateLoaded extends CertificateState {
     Certificate? certificate,
     bool clearCertificate = false,
     List<Attachment>? attachments,
+    List<Certificate>? records,
     AppFailure? actionError,
     bool clearActionError = false,
   }) =>
@@ -48,6 +51,7 @@ final class CertificateLoaded extends CertificateState {
         sites: sites ?? this.sites,
         certificate: clearCertificate ? null : (certificate ?? this.certificate),
         attachments: attachments ?? this.attachments,
+        records: records ?? this.records,
         actionError: clearActionError ? null : (actionError ?? this.actionError),
       );
 
@@ -57,10 +61,11 @@ final class CertificateLoaded extends CertificateState {
       listEquals(other.sites, sites) &&
       other.certificate == certificate &&
       listEquals(other.attachments, attachments) &&
+      listEquals(other.records, records) &&
       other.actionError == actionError;
 
   @override
-  int get hashCode => Object.hash(Object.hashAll(sites), certificate, Object.hashAll(attachments), actionError);
+  int get hashCode => Object.hash(Object.hashAll(sites), certificate, Object.hashAll(attachments), Object.hashAll(records), actionError);
 }
 
 final class CertificateError extends CertificateState {
@@ -88,6 +93,19 @@ class CertificateCubit extends Cubit<CertificateState> {
     }
     final sites = sitesResult.getOrElse((_) => const <Site>[]);
     emit(CertificateLoaded(sites: sites));
+  }
+
+  Future<void> loadRecords(String siteId) async {
+    final current = state;
+    final sites = current is CertificateLoaded ? current.sites : <Site>[];
+    final result = await _certsRepo.listForSite(siteId);
+    if (isClosed) return;
+    if (result case Left(value: final failure)) {
+      emit(CertificateError(failure));
+      return;
+    }
+    final records = result.getOrElse((_) => const <Certificate>[]);
+    emit(CertificateLoaded(sites: sites, records: records));
   }
 
   Future<void> openCertificate(String certificateId) async {

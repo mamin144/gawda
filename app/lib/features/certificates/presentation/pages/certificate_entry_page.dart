@@ -17,9 +17,17 @@ import '../../domain/entities/certificate_status.dart';
 import '../../domain/repositories/certificates_repository.dart';
 import '../bloc/certificate_cubit.dart';
 
-/// Site-user certificate entry screen. Owns a [CertificateCubit] and lets the
-/// user create/edit a draft, attach files, submit, and finalize with a signed
-/// copy.
+/// Site-user certificate entry body (no Scaffold). Used both as a standalone
+/// page and as a tab inside the site shell.
+class CertificateEntryBody extends StatelessWidget {
+  const CertificateEntryBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _EntryBody();
+  }
+}
+
 class CertificateEntryPage extends StatelessWidget {
   const CertificateEntryPage({super.key});
 
@@ -30,19 +38,31 @@ class CertificateEntryPage extends StatelessWidget {
         context.read<CertificatesRepository>(),
         context.read<SitesRepository>(),
       )..loadSites(),
-      child: const _View(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context).siteHomeTitle),
+          actions: [
+            IconButton(
+              tooltip: AppLocalizations.of(context).logoutButton,
+              onPressed: () => context.read<SessionCubit>().signOut(),
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+        ),
+        body: const CertificateEntryBody(),
+      ),
     );
   }
 }
 
-class _View extends StatefulWidget {
-  const _View();
+class _EntryBody extends StatefulWidget {
+  const _EntryBody();
 
   @override
-  State<_View> createState() => _ViewState();
+  State<_EntryBody> createState() => _EntryBodyState();
 }
 
-class _ViewState extends State<_View> {
+class _EntryBodyState extends State<_EntryBody> {
   final _amount = TextEditingController();
   final _notes = TextEditingController();
   Site? _site;

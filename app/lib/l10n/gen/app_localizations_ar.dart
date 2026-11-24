@@ -290,4 +290,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get attachmentDuplicate => 'هذا الملف مرفوع من قبل';
+
+  @override
+  String get siteTabDashboard => 'الرئيسية';
+
+  @override
+  String get siteTabEntry => 'إدخال';
+
+  @override
+  String get siteTabRecords => 'السجلات';
+
+  @override
+  String get siteTabAccount => 'حسابي';
+
+  @override
+  String get certificatePeriod => 'فترة الشهادة';
+
+  @override
+  String get noCertificates => 'لا توجد شهادات بعد';
+
+  @override
+  String get certificateRecords => 'سجل الشهادات';
 }

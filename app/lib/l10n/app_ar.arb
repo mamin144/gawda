@@ -115,5 +115,12 @@
   "attachmentPickImage": "صورة",
   "attachmentPickFile": "ملف",
   "attachmentTooLarge": "حجم الملف يتجاوز 2 ميجا",
-  "attachmentDuplicate": "هذا الملف مرفوع من قبل"
+  "attachmentDuplicate": "هذا الملف مرفوع من قبل",
+  "siteTabDashboard": "الرئيسية",
+  "siteTabEntry": "إدخال",
+  "siteTabRecords": "السجلات",
+  "siteTabAccount": "حسابي",
+  "certificatePeriod": "فترة الشهادة",
+  "noCertificates": "لا توجد شهادات بعد",
+  "certificateRecords": "سجل الشهادات"
 }
