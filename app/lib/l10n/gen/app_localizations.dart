@@ -229,6 +229,186 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المستخدمون'**
   String get navUsers;
+
+  /// No description provided for @errorSessionExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت الجلسة. سجّل الدخول مرة أخرى'**
+  String get errorSessionExpired;
+
+  /// No description provided for @errorDuplicate.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه القيمة مستخدمة من قبل'**
+  String get errorDuplicate;
+
+  /// No description provided for @errorForbidden.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليست لديك صلاحية لتنفيذ هذا الإجراء'**
+  String get errorForbidden;
+
+  /// No description provided for @errorBusinessRule.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تنفيذ هذا الإجراء وفق قواعد النظام'**
+  String get errorBusinessRule;
+
+  /// No description provided for @fieldTooLong.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب ألا يزيد عن {max} حرفًا'**
+  String fieldTooLong(int max);
+
+  /// No description provided for @cancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get save;
+
+  /// No description provided for @sitesSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث بالرمز أو الاسم'**
+  String get sitesSearchHint;
+
+  /// No description provided for @sitesFilterActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'النشطة'**
+  String get sitesFilterActive;
+
+  /// No description provided for @sitesFilterArchived.
+  ///
+  /// In ar, this message translates to:
+  /// **'المؤرشفة'**
+  String get sitesFilterArchived;
+
+  /// No description provided for @sitesFilterAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get sitesFilterAll;
+
+  /// No description provided for @sitesEmptyActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواقع نشطة. أضف موقعًا جديدًا'**
+  String get sitesEmptyActive;
+
+  /// No description provided for @sitesEmptyArchived.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواقع مؤرشفة'**
+  String get sitesEmptyArchived;
+
+  /// No description provided for @sitesEmptyAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواقع بعد. أضف موقعًا جديدًا'**
+  String get sitesEmptyAll;
+
+  /// No description provided for @sitesEmptySearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواقع مطابقة للبحث'**
+  String get sitesEmptySearch;
+
+  /// No description provided for @siteActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشط'**
+  String get siteActive;
+
+  /// No description provided for @siteArchived.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤرشف'**
+  String get siteArchived;
+
+  /// No description provided for @siteAdd.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة موقع'**
+  String get siteAdd;
+
+  /// No description provided for @siteAddTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة موقع جديد'**
+  String get siteAddTitle;
+
+  /// No description provided for @siteEditTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الموقع'**
+  String get siteEditTitle;
+
+  /// No description provided for @siteCodeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز الموقع'**
+  String get siteCodeLabel;
+
+  /// No description provided for @siteNameLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الموقع'**
+  String get siteNameLabel;
+
+  /// No description provided for @siteCodeDuplicate.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز الموقع مستخدم لموقع آخر'**
+  String get siteCodeDuplicate;
+
+  /// No description provided for @siteCodeLocked.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تغيير رمز الموقع بعد تسجيل شهادات عليه'**
+  String get siteCodeLocked;
+
+  /// No description provided for @siteActions.
+  ///
+  /// In ar, this message translates to:
+  /// **'خيارات الموقع'**
+  String get siteActions;
+
+  /// No description provided for @siteEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل'**
+  String get siteEdit;
+
+  /// No description provided for @siteArchive.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرشفة'**
+  String get siteArchive;
+
+  /// No description provided for @siteRestore.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة'**
+  String get siteRestore;
+
+  /// No description provided for @siteArchiveConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرشفة الموقع؟'**
+  String get siteArchiveConfirmTitle;
+
+  /// No description provided for @siteArchiveConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سينتقل الموقع «{name}» إلى قائمة المواقع المؤرشفة. يمكنك استعادته لاحقًا.'**
+  String siteArchiveConfirmBody(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

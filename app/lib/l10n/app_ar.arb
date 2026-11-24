@@ -29,5 +29,49 @@
   },
   "navOverview": "نظرة عامة",
   "navSites": "المواقع",
-  "navUsers": "المستخدمون"
+  "navUsers": "المستخدمون",
+  "errorSessionExpired": "انتهت الجلسة. سجّل الدخول مرة أخرى",
+  "errorDuplicate": "هذه القيمة مستخدمة من قبل",
+  "errorForbidden": "ليست لديك صلاحية لتنفيذ هذا الإجراء",
+  "errorBusinessRule": "لا يمكن تنفيذ هذا الإجراء وفق قواعد النظام",
+  "fieldTooLong": "يجب ألا يزيد عن {max} حرفًا",
+  "@fieldTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "sitesSearchHint": "ابحث بالرمز أو الاسم",
+  "sitesFilterActive": "النشطة",
+  "sitesFilterArchived": "المؤرشفة",
+  "sitesFilterAll": "الكل",
+  "sitesEmptyActive": "لا توجد مواقع نشطة. أضف موقعًا جديدًا",
+  "sitesEmptyArchived": "لا توجد مواقع مؤرشفة",
+  "sitesEmptyAll": "لا توجد مواقع بعد. أضف موقعًا جديدًا",
+  "sitesEmptySearch": "لا توجد مواقع مطابقة للبحث",
+  "siteActive": "نشط",
+  "siteArchived": "مؤرشف",
+  "siteAdd": "إضافة موقع",
+  "siteAddTitle": "إضافة موقع جديد",
+  "siteEditTitle": "تعديل الموقع",
+  "siteCodeLabel": "رمز الموقع",
+  "siteNameLabel": "اسم الموقع",
+  "siteCodeDuplicate": "رمز الموقع مستخدم لموقع آخر",
+  "siteCodeLocked": "لا يمكن تغيير رمز الموقع بعد تسجيل شهادات عليه",
+  "siteActions": "خيارات الموقع",
+  "siteEdit": "تعديل",
+  "siteArchive": "أرشفة",
+  "siteRestore": "استعادة",
+  "siteArchiveConfirmTitle": "أرشفة الموقع؟",
+  "siteArchiveConfirmBody": "سينتقل الموقع «{name}» إلى قائمة المواقع المؤرشفة. يمكنك استعادته لاحقًا.",
+  "@siteArchiveConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }
