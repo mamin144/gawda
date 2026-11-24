@@ -52,7 +52,6 @@ void main() {
       'invalid_sites',
       'invalid_target',
       'archive_inconsistent',
-      'user_exists',
     ]) {
       test('maps P0001 $code to BusinessRuleFailure($code)', () {
         final error = PostgrestException(message: code, code: 'P0001');

@@ -19,7 +19,6 @@ const businessRuleCodes = {
   'invalid_sites',
   'invalid_target',
   'archive_inconsistent',
-  'user_exists',
 };
 
 /// Maps any thrown object to the closed [AppFailure] hierarchy.

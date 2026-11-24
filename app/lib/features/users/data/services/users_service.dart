@@ -37,8 +37,9 @@ class SupabaseUsersService implements UsersService {
   }
 
   @override
-  Future<void> updateProfile(String id, Map<String, dynamic> values) =>
-      _client.from('profiles').update(values).eq('id', id);
+  Future<void> updateProfile(String id, Map<String, dynamic> values) async {
+    await _client.from('profiles').update(values).eq('id', id).select('id').single();
+  }
 
   @override
   Future<Object?> rpc(String function, Map<String, dynamic> params) =>
