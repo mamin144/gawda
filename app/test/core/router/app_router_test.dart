@@ -15,7 +15,7 @@ import 'package:gawda_app/features/admin/presentation/admin_shell.dart';
 import 'package:gawda_app/features/certificates/domain/repositories/certificates_repository.dart';
 import 'package:gawda_app/features/sites/domain/entities/site.dart';
 import 'package:gawda_app/features/sites/domain/repositories/sites_repository.dart';
-import 'package:gawda_app/features/certificates/presentation/pages/certificate_entry_page.dart';
+import 'package:gawda_app/features/certificates/presentation/pages/site_shell.dart';
 import 'package:gawda_app/features/sites/presentation/pages/sites_page.dart';
 import 'package:gawda_app/features/users/domain/entities/managed_user.dart';
 import 'package:gawda_app/features/users/domain/repositories/users_repository.dart';
@@ -102,12 +102,12 @@ void main() {
 
     await tester.pumpWidget(buildApp(cubit, router));
     await tester.pumpAndSettle();
-    expect(find.byType(CertificateEntryPage), findsOneWidget);
+    expect(find.byType(SiteShell), findsOneWidget);
 
     router.go('/admin');
     await tester.pumpAndSettle();
 
-    expect(find.byType(CertificateEntryPage), findsOneWidget);
+    expect(find.byType(SiteShell), findsOneWidget);
     expect(find.byType(AdminHomePage), findsNothing);
   });
 
@@ -159,7 +159,7 @@ void main() {
     router.go('/admin/sites');
     await tester.pumpAndSettle();
 
-    expect(find.byType(CertificateEntryPage), findsOneWidget);
+    expect(find.byType(SiteShell), findsOneWidget);
     expect(find.byType(AdminShell), findsNothing);
   });
 }
