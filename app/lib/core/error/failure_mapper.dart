@@ -7,7 +7,11 @@ import 'app_failure.dart';
 import 'network_error_stub.dart' if (dart.library.io) 'network_error_io.dart';
 
 /// Machine codes raised as `P0001` (message == code) by database guards and
-/// RPCs, or returned by Edge Functions, that map to [BusinessRuleFailure].
+/// RPCs that map to [BusinessRuleFailure]. Edge Function error codes are NOT
+/// mapped here: a `FunctionException` carries an HTTP status and a JSON body,
+/// so each feature repository maps its own function contract (e.g.
+/// `UsersRepositoryImpl` for `admin-create-user`) and falls back to
+/// [mapExceptionToFailure] for anything it does not recognise.
 const businessRuleCodes = {
   'cannot_change_self',
   'last_admin',
@@ -29,6 +33,8 @@ AppFailure mapExceptionToFailure(Object error) => switch (error) {
     BusinessRuleFailure(message),
   PostgrestException(:final code, :final message) => ServerFailure(code: code, message: message),
   FunctionException(status: 403) => const ForbiddenFailure(),
+  // No HTTP response reached the client (transport failure, status 0).
+  FunctionsFetchException() => const NetworkFailure(),
   TimeoutException() || http.ClientException() => const NetworkFailure(),
   _ when isPlatformNetworkError(error) => const NetworkFailure(),
   _ => UnexpectedFailure(cause: error),

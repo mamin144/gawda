@@ -73,6 +73,11 @@ void main() {
       expect(mapExceptionToFailure(error), isA<ForbiddenFailure>());
     });
 
+    test('maps Edge Function transport failure (FunctionsFetchException) to NetworkFailure', () {
+      const error = FunctionsFetchException(details: 'connection refused');
+      expect(mapExceptionToFailure(error), isA<NetworkFailure>());
+    });
+
     test('maps SocketException to NetworkFailure', () {
       const error = SocketException('Failed host lookup');
       expect(mapExceptionToFailure(error), isA<NetworkFailure>());
