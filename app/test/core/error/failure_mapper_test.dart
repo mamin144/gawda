@@ -22,12 +22,55 @@ void main() {
       expect(failure.message, 'Too many requests');
     });
 
-    test('maps PostgrestException to ServerFailure preserving code and message', () {
-      const error = PostgrestException(message: 'permission denied', code: '42501');
+    test('maps unclassified PostgrestException to ServerFailure preserving code and message', () {
+      const error = PostgrestException(message: 'check violation', code: '23514');
       final failure = mapExceptionToFailure(error);
       expect(failure, isA<ServerFailure>());
-      expect((failure as ServerFailure).code, '42501');
-      expect(failure.message, 'permission denied');
+      expect((failure as ServerFailure).code, '23514');
+      expect(failure.message, 'check violation');
+    });
+
+    test('maps unique violation 23505 to DuplicateFailure', () {
+      const error = PostgrestException(message: 'duplicate key value', code: '23505');
+      expect(mapExceptionToFailure(error), isA<DuplicateFailure>());
+    });
+
+    test('maps permission denied 42501 to ForbiddenFailure', () {
+      const error = PostgrestException(message: 'permission denied', code: '42501');
+      expect(mapExceptionToFailure(error), isA<ForbiddenFailure>());
+    });
+
+    test('maps P0001 forbidden to ForbiddenFailure', () {
+      const error = PostgrestException(message: 'forbidden', code: 'P0001');
+      expect(mapExceptionToFailure(error), isA<ForbiddenFailure>());
+    });
+
+    for (final code in const [
+      'cannot_change_self',
+      'last_admin',
+      'code_locked',
+      'invalid_sites',
+      'invalid_target',
+      'archive_inconsistent',
+      'user_exists',
+    ]) {
+      test('maps P0001 $code to BusinessRuleFailure($code)', () {
+        final error = PostgrestException(message: code, code: 'P0001');
+        expect(mapExceptionToFailure(error), BusinessRuleFailure(code));
+      });
+    }
+
+    test('maps unknown P0001 message to ServerFailure preserving code and message', () {
+      const error = PostgrestException(message: 'something_else', code: 'P0001');
+      final failure = mapExceptionToFailure(error);
+      expect(failure, isA<ServerFailure>());
+      expect((failure as ServerFailure).code, 'P0001');
+      expect(failure.message, 'something_else');
+    });
+
+    test('maps Edge Function HTTP 403 to ForbiddenFailure', () {
+      const error = FunctionException(status: 403, details: {'error': 'forbidden'});
+      expect(mapExceptionToFailure(error), isA<ForbiddenFailure>());
     });
 
     test('maps SocketException to NetworkFailure', () {
@@ -53,6 +96,14 @@ void main() {
     });
   });
 
+  test('BusinessRuleFailure has value equality on its code', () {
+    expect(const BusinessRuleFailure('last_admin'), BusinessRuleFailure('last_admin'.toString()));
+    expect(
+      const BusinessRuleFailure('last_admin') == const BusinessRuleFailure('code_locked'),
+      isFalse,
+    );
+  });
+
   test('AppFailure is sealed and exhaustively matchable without a default arm', () {
     // Compile-time proof: adding a new subtype breaks this switch.
     String label(AppFailure failure) => switch (failure) {
@@ -61,10 +112,14 @@ void main() {
       AccountInactiveFailure() => 'accountInactive',
       NoSessionFailure() => 'noSession',
       ServerFailure() => 'server',
+      DuplicateFailure() => 'duplicate',
+      ForbiddenFailure() => 'forbidden',
+      BusinessRuleFailure() => 'businessRule',
       UnexpectedFailure() => 'unexpected',
     };
     expect(label(const InvalidCredentialsFailure()), 'invalidCredentials');
     expect(label(const AccountInactiveFailure()), 'accountInactive');
     expect(label(const NoSessionFailure()), 'noSession');
+    expect(label(const BusinessRuleFailure('last_admin')), 'businessRule');
   });
 }

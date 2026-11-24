@@ -98,7 +98,12 @@ class LoginPage extends StatelessWidget {
     InvalidCredentialsFailure() => l10n.errorInvalidCredentials,
     NetworkFailure() => l10n.errorNetwork,
     AccountInactiveFailure() => l10n.errorAccountInactive,
-    NoSessionFailure() || ServerFailure() => l10n.errorServer,
+    // Duplicate/Forbidden/BusinessRule never arise from sign-in; generic server text.
+    NoSessionFailure() ||
+    ServerFailure() ||
+    DuplicateFailure() ||
+    ForbiddenFailure() ||
+    BusinessRuleFailure() => l10n.errorServer,
     UnexpectedFailure() => l10n.errorUnexpected,
   };
 }

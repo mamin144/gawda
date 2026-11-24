@@ -31,6 +31,31 @@ final class ServerFailure extends AppFailure {
   final String? message;
 }
 
+/// A unique constraint was violated (Postgres `23505`), e.g. a duplicate site code.
+final class DuplicateFailure extends AppFailure {
+  const DuplicateFailure();
+}
+
+/// The caller is not allowed to perform the action: Postgres `42501`,
+/// a `P0001` raise with message `forbidden`, or an Edge Function HTTP 403.
+final class ForbiddenFailure extends AppFailure {
+  const ForbiddenFailure();
+}
+
+/// A server-side business rule rejected the action. [code] is the machine code
+/// raised by the database or Edge Function (e.g. `last_admin`, `code_locked`).
+final class BusinessRuleFailure extends AppFailure {
+  const BusinessRuleFailure(this.code);
+
+  final String code;
+
+  @override
+  bool operator ==(Object other) => other is BusinessRuleFailure && other.code == code;
+
+  @override
+  int get hashCode => Object.hash(BusinessRuleFailure, code);
+}
+
 /// Anything unclassified; the original object is kept for diagnostics only.
 final class UnexpectedFailure extends AppFailure {
   const UnexpectedFailure({required this.cause});
