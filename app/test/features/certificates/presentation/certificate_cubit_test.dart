@@ -17,20 +17,24 @@ class MockCertificatesRepository extends Mock implements CertificatesRepository 
 
 class MockSitesRepository extends Mock implements SitesRepository {}
 
-Certificate _cert({String id = 'c1', CertificateStatus status = CertificateStatus.draft}) =>
-    Certificate(
-      id: id,
-      siteId: 's1',
-      certificateDate: DateTime(2026, 3, 1),
-      periodYear: 2026,
-      periodMonth: 3,
-      periodHalf: 1,
-      amount: '10',
-      status: status,
-      createdBy: 'u1',
-      createdAt: DateTime.utc(2026, 3, 1),
-      updatedAt: DateTime.utc(2026, 3, 1),
-    );
+Certificate _cert({
+  String id = 'c1',
+  CertificateStatus status = CertificateStatus.draft,
+  String siteId = 's1',
+  DateTime? date,
+}) => Certificate(
+  id: id,
+  siteId: siteId,
+  certificateDate: date ?? DateTime(2026, 3, 1),
+  periodYear: 2026,
+  periodMonth: 3,
+  periodHalf: 1,
+  amount: '10',
+  status: status,
+  createdBy: 'u1',
+  createdAt: DateTime.utc(2026, 3, 1),
+  updatedAt: DateTime.utc(2026, 3, 1),
+);
 
 final _att = Attachment(
   id: 'a1',
@@ -260,15 +264,21 @@ void main() {
     expect(s.certificate, _cert());
   });
 
-  test('loadSitesAndRecords loads the first site records once', () async {
-    when(() => certs.listForSite(any())).thenAnswer((_) async => Right([_cert()]));
+  test('loadSitesAndRecords loads every site, newest certificate first', () async {
+    const site2 = Site(id: 's2', code: 'B02', name: 'Two', isActive: true);
+    when(() => sites.list()).thenAnswer((_) async => const Right([_site, site2]));
+    final older = _cert(id: 'c1');
+    final newer = _cert(id: 'c3', siteId: 's2', date: DateTime(2026, 4, 1));
+    when(() => certs.listForSite('s1')).thenAnswer((_) async => Right([older]));
+    when(() => certs.listForSite('s2')).thenAnswer((_) async => Right([newer]));
 
     await cubit.loadSitesAndRecords();
 
     verify(() => certs.listForSite('s1')).called(1);
+    verify(() => certs.listForSite('s2')).called(1);
     final s = cubit.state as CertificateLoaded;
-    expect(s.sites, [_site]);
-    expect(s.records, [_cert()]);
+    expect(s.sites, [_site, site2]);
+    expect(s.records, [newer, older]);
   });
 
   test('loadSitesAndRecords with no sites does not query records', () async {
@@ -291,5 +301,133 @@ void main() {
     final s = cubit.state as CertificateLoaded;
     expect(s.certificate, _cert());
     expect(s.records, [_cert(id: 'c2')]);
+  });
+
+  group('auto-save and submit (I1)', () {
+    test('an explicit save cancels a pending auto-save', () async {
+      await cubit.loadSites();
+      stubCreate();
+      stubUpdate();
+
+      cubit.scheduleAutoSave(siteId: 's1', date: DateTime(2026, 3, 1), amount: '5', notes: null);
+      await save('6');
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+
+      verify(
+        () => certs.createDraft(
+          siteId: 's1',
+          certificateDate: DateTime(2026, 3, 1),
+          amount: '6',
+          notes: null,
+        ),
+      ).called(1);
+      verifyNever(
+        () => certs.updateDraft(
+          any(),
+          certificateDate: any(named: 'certificateDate'),
+          amount: any(named: 'amount'),
+          notes: any(named: 'notes'),
+        ),
+      );
+    });
+
+    test('submit cancels a pending auto-save', () async {
+      await cubit.loadSites();
+      stubCreate();
+      stubUpdate();
+      await save();
+      when(() => certs.submit(any()))
+          .thenAnswer((_) async => Right(_cert(status: CertificateStatus.inReview)));
+
+      cubit.scheduleAutoSave(siteId: 's1', date: DateTime(2026, 3, 1), amount: '30', notes: null);
+      expect(await cubit.submit('c1'), isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+
+      verifyNever(
+        () => certs.updateDraft(
+          any(),
+          certificateDate: any(named: 'certificateDate'),
+          amount: any(named: 'amount'),
+          notes: any(named: 'notes'),
+        ),
+      );
+      expect((cubit.state as CertificateLoaded).actionError, isNull);
+    });
+
+    test('submit waits for a save that is still running', () async {
+      await cubit.loadSites();
+      final calls = <String>[];
+      final gate = Completer<void>();
+      when(
+        () => certs.createDraft(
+          siteId: any(named: 'siteId'),
+          certificateDate: any(named: 'certificateDate'),
+          amount: any(named: 'amount'),
+          notes: any(named: 'notes'),
+        ),
+      ).thenAnswer((_) async {
+        await gate.future;
+        calls.add('create');
+        return Right(_cert());
+      });
+      when(() => certs.submit(any())).thenAnswer((_) async {
+        calls.add('submit');
+        return Right(_cert(status: CertificateStatus.inReview));
+      });
+
+      final saving = save();
+      final submitting = cubit.submit('c1');
+      gate.complete();
+      await Future.wait([saving, submitting]);
+
+      expect(calls, ['create', 'submit']);
+    });
+  });
+
+  group('records stay current (I4)', () {
+    test('a created draft joins the records and a submit updates its row', () async {
+      when(() => certs.listForSite(any()))
+          .thenAnswer((_) async => Right([_cert(id: 'c0', date: DateTime(2026, 2, 1))]));
+      await cubit.loadSitesAndRecords();
+      stubCreate();
+      when(() => certs.submit(any()))
+          .thenAnswer((_) async => Right(_cert(status: CertificateStatus.inReview)));
+
+      await save();
+      expect((cubit.state as CertificateLoaded).records.map((c) => c.id), ['c1', 'c0']);
+
+      await cubit.submit('c1');
+      final records = (cubit.state as CertificateLoaded).records;
+      expect(records.first, _cert(status: CertificateStatus.inReview));
+      expect(records, hasLength(2));
+    });
+
+    test('openCertificate keeps the records', () async {
+      when(() => certs.listForSite(any())).thenAnswer((_) async => Right([_cert()]));
+      await cubit.loadSitesAndRecords();
+      when(() => certs.getById(any())).thenAnswer((_) async => Right(_cert()));
+      when(() => certs.listAttachments(any())).thenAnswer((_) async => Right([_att]));
+
+      await cubit.openCertificate('c1');
+
+      final s = cubit.state as CertificateLoaded;
+      expect(s.certificate, _cert());
+      expect(s.records, [_cert()]);
+    });
+
+    test('newCertificate clears the open certificate and keeps the records', () async {
+      when(() => certs.listForSite(any())).thenAnswer((_) async => Right([_cert()]));
+      await cubit.loadSitesAndRecords();
+      when(() => certs.getById(any())).thenAnswer((_) async => Right(_cert()));
+      when(() => certs.listAttachments(any())).thenAnswer((_) async => Right([_att]));
+      await cubit.openCertificate('c1');
+
+      cubit.newCertificate();
+
+      final s = cubit.state as CertificateLoaded;
+      expect(s.certificate, isNull);
+      expect(s.attachments, isEmpty);
+      expect(s.records, [_cert()]);
+    });
   });
 }

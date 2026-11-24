@@ -118,9 +118,14 @@ class CertificateCubit extends Cubit<CertificateState> {
     required String amount,
     String? notes,
   }) {
-    final next = _saveQueue.then(
-      (_) => _saveNow(siteId: siteId, date: date, amount: amount, notes: notes),
-    );
+    // An explicit save supersedes a pending auto-save of older input.
+    _autoSaveTimer?.cancel();
+    return _enqueue(() => _saveNow(siteId: siteId, date: date, amount: amount, notes: notes));
+  }
+
+  /// Runs [action] after every queued save, so writes never overlap.
+  Future<bool> _enqueue(Future<bool> Function() action) {
+    final next = _saveQueue.then((_) => action());
     _saveQueue = next.catchError((Object _) => false);
     return next;
   }
@@ -218,11 +223,51 @@ class CertificateCubit extends Cubit<CertificateState> {
     emit(CertificateLoaded(sites: sites));
   }
 
-  /// Loads the sites, then the records of the first site (once).
+  /// Loads the sites, then the records of every site.
   Future<void> loadSitesAndRecords() async {
     await loadSites();
-    if (state case CertificateLoaded(:final sites) when sites.isNotEmpty) {
-      await loadRecords(sites.first.id);
+    if (state is CertificateLoaded) await loadAllRecords();
+  }
+
+  /// Reloads the records of every loaded site, newest certificate first,
+  /// keeping any open certificate.
+  Future<void> loadAllRecords() async {
+    final current = state;
+    if (current is! CertificateLoaded) return;
+    final results = await Future.wait(current.sites.map((s) => _certsRepo.listForSite(s.id)));
+    if (isClosed) return;
+    final records = <Certificate>[];
+    for (final result in results) {
+      switch (result) {
+        case Left(value: final failure):
+          _setError(failure);
+          return;
+        case Right(value: final list):
+          records.addAll(list);
+      }
+    }
+    if (state case final CertificateLoaded loaded) {
+      emit(loaded.copyWith(records: _sorted(records), clearActionError: true));
+    }
+  }
+
+  /// Newest certificate date first; ties by creation time, newest first.
+  static List<Certificate> _sorted(List<Certificate> records) {
+    final list = [...records]
+      ..sort((a, b) {
+        final byDate = b.certificateDate.compareTo(a.certificateDate);
+        return byDate != 0 ? byDate : b.createdAt.compareTo(a.createdAt);
+      });
+    return List.unmodifiable(list);
+  }
+
+  /// Clears the open certificate so the entry form starts a new one.
+  void newCertificate() {
+    _autoSaveTimer?.cancel();
+    if (state case final CertificateLoaded loaded) {
+      emit(
+        CertificateLoaded(sites: loaded.sites, records: loaded.records),
+      );
     }
   }
 
@@ -247,8 +292,10 @@ class CertificateCubit extends Cubit<CertificateState> {
   }
 
   Future<void> openCertificate(String certificateId) async {
+    _autoSaveTimer?.cancel();
     final current = state;
     final sites = current is CertificateLoaded ? current.sites : <Site>[];
+    final records = current is CertificateLoaded ? current.records : const <Certificate>[];
     emit(const CertificateLoading());
     final certResult = await _certsRepo.getById(certificateId);
     final attResult = await _certsRepo.listAttachments(certificateId);
@@ -259,7 +306,9 @@ class CertificateCubit extends Cubit<CertificateState> {
     }
     final cert = certResult.getOrElse((_) => throw StateError('unreachable'));
     final atts = attResult.getOrElse((_) => const <Attachment>[]);
-    emit(CertificateLoaded(sites: sites, certificate: cert, attachments: atts));
+    emit(
+      CertificateLoaded(sites: sites, certificate: cert, attachments: atts, records: records),
+    );
   }
 
   Future<bool> createDraft({
@@ -292,9 +341,11 @@ class CertificateCubit extends Cubit<CertificateState> {
     return _applyResult(result);
   }
 
-  Future<bool> submit(String id) async {
-    final result = await _certsRepo.submit(id);
-    return _applyResult(result);
+  /// Submits [id] after any queued save; a pending auto-save is dropped so
+  /// it cannot try to edit the certificate once it is under review.
+  Future<bool> submit(String id) {
+    _autoSaveTimer?.cancel();
+    return _enqueue(() async => _applyResult(await _certsRepo.submit(id)));
   }
 
   Future<bool> uploadAttachment({
@@ -337,7 +388,10 @@ class CertificateCubit extends Cubit<CertificateState> {
     }
     final cert = result.getOrElse((_) => throw StateError('unreachable'));
     if (state case final CertificateLoaded loaded) {
-      emit(loaded.copyWith(certificate: cert, clearActionError: true));
+      final records = [...loaded.records.where((c) => c.id != cert.id), cert];
+      emit(
+        loaded.copyWith(certificate: cert, records: _sorted(records), clearActionError: true),
+      );
     } else {
       emit(CertificateLoaded(sites: const [], certificate: cert));
     }
